@@ -3,18 +3,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-
 public class IoTServer {
     private ExecutorService executorService;
     private AuthenticationService authenticationService;
+    private DeviceManager deviceManager;
 
     public IoTServer() {
         executorService = Executors.newCachedThreadPool();
         authenticationService = new AuthenticationService();
+        deviceManager = new DeviceManager();
     }
 
     public static void main(String[] args) {
@@ -26,51 +25,67 @@ public class IoTServer {
             System.out.println("Servidor iniciado.");
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                executorService.submit(new ClientHandlerThread(clientSocket, authenticationService));
+                executorService.submit(new ClientHandlerThread(clientSocket, authenticationService, deviceManager));
             }
         } catch (IOException e) {
             System.err.println("Erro ao iniciar o servidor: " + e.getMessage());
         }
     }
 
-    class ClientHandlerThread implements Runnable {
-        private Socket clientSocket;
-        private AuthenticationService authenticationService;
+  // classes ClientHandlerThread, AuthenticationService e DeviceManager aqui
+  class ClientHandlerThread implements Runnable {
+      private Socket clientSocket;
+      private AuthenticationService authenticationService;
+      private DeviceManager deviceManager;
 
-        ClientHandlerThread(Socket socket, AuthenticationService authService) {
-            this.clientSocket = socket;
-            this.authenticationService = authService;
-        }
+      ClientHandlerThread(Socket socket, AuthenticationService authService, DeviceManager deviceMgr) {
+          this.clientSocket = socket;
+          this.authenticationService = authService;
+          this.deviceManager = deviceMgr;
+      }
 
-        @Override
-        public void run() {
-            try {
-                ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream());
+      @Override
+      public void run() {
+          try {
+              ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
+              ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream());
 
-                while (true) {
-                    String username = (String) inStream.readObject();
-                    String password = (String) inStream.readObject();
+              String username = (String) inStream.readObject();
+              String password = (String) inStream.readObject();
 
-                    String response = authenticationService.handleAuthentication(username, password);
-                    outStream.writeUTF(response);
-                    outStream.flush();
+              String authResponse = authenticationService.handleAuthentication(username, password);
+              outStream.writeUTF(authResponse);
+              outStream.flush();
 
-                    if (!response.equals("WRONG-PWD")) {
-                        break; // Sai do loop se não for "WRONG-PWD"
-                    }
-                }
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("Erro ao tratar cliente: " + e.getMessage());
-            } finally {
-                try {
-                    clientSocket.close();
-                } catch (IOException e) {
-                    System.err.println("Erro ao fechar socket: " + e.getMessage());
-                }
-            }
-        }
-    }
+              if (!authResponse.equals("OK-USER") && !authResponse.equals("OK-NEW-USER")) {
+                  return; // Encerra se a autenticação falhar.
+              }
+
+              String devId = (String) inStream.readObject();
+              if (deviceManager.isDeviceActive(username, devId)) {
+                  outStream.writeUTF("NOK-DEVID");
+              } else {
+                  deviceManager.registerDevice(username, devId);
+                  outStream.writeUTF("OK-DEVID");
+              }
+              outStream.flush();
+
+          } catch (IOException | ClassNotFoundException e) {
+              System.err.println("Erro ao tratar cliente: " + e.getMessage());
+          } finally {
+              try {
+                  if (clientSocket != null) {
+                      clientSocket.close();
+                  }
+              } catch (IOException e) {
+                  System.err.println("Erro ao fechar socket: " + e.getMessage());
+              }
+          }
+      }
+
+
+
+
 
     public class AuthenticationService {
         private final String USERS_FILE = "src/users.txt";
@@ -116,6 +131,22 @@ public class IoTServer {
             } catch (IOException e) {
                 System.err.println("Erro ao salvar novo usuário: " + e.getMessage());
             }
+        }
+    }
+
+    public class DeviceManager {
+        private Map<String, String> activeDevices;
+
+        public DeviceManager() {
+            activeDevices = new HashMap<>();
+        }
+
+        public synchronized boolean isDeviceActive(String userId, String devId) {
+            return activeDevices.containsKey(userId) && activeDevices.get(userId).equals(devId);
+        }
+
+        public synchronized void registerDevice(String userId, String devId) {
+            activeDevices.put(userId, devId);
         }
     }
 
