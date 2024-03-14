@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class IoTDevice {
-    private static final String USER_ID = "Erickson";
+    private static final String USER_ID = "Erickson"; // Supondo que seja um identificador único para cada cliente
     private static final String HOST = "localhost";
     private static final int PORT = 23456;
 
@@ -20,7 +20,7 @@ public class IoTDevice {
              Scanner scanner = new Scanner(System.in)) {
 
             if (autenticarUsuario(scanner, outStream, inStream)) {
-                enviarDeviceId(scanner, outStream, inStream);  // Alteração aqui
+                enviarDeviceId(scanner, outStream, inStream);
             }
 
         } catch (IOException e) {
@@ -29,27 +29,25 @@ public class IoTDevice {
     }
 
     private boolean autenticarUsuario(Scanner scanner, ObjectOutputStream outStream, ObjectInputStream inStream) throws IOException {
-        while (true) {
-            System.out.println("Digite a sua senha:");
-            String senha = scanner.nextLine();
+        System.out.println("Digite a sua senha:");
+        String senha = scanner.nextLine();
 
-            enviarCredenciais(outStream, USER_ID, senha);
+        enviarCredenciais(outStream, USER_ID, senha);
 
-            String response = inStream.readUTF();
-            switch (response) {
-                case "WRONG-PWD":
-                    System.out.println("Senha incorreta. Tente novamente.");
-                    break;
-                case "OK-NEW-USER":
-                    System.out.println("Novo usuário registrado.");
-                    return true;
-                case "OK-USER":
-                    System.out.println("Usuário existente autenticado.");
-                    return true;
-                default:
-                    System.out.println("Resposta não reconhecida.");
-                    return false;
-            }
+        String response = inStream.readUTF();
+        switch (response) {
+            case "WRONG-PWD":
+                System.out.println("Senha incorreta. Tente novamente.");
+                return false;
+            case "OK-NEW-USER":
+                System.out.println("Novo usuário registrado.");
+                return true;
+            case "OK-USER":
+                System.out.println("Usuário existente autenticado.");
+                return true;
+            default:
+                System.out.println("Resposta não reconhecida: " + response);
+                return false;
         }
     }
 
@@ -61,7 +59,13 @@ public class IoTDevice {
         outStream.flush();
 
         String deviceResponse = inStream.readUTF();
-        System.out.println(deviceResponse.equals("OK-DEVID") ? "Device ID autenticado com sucesso." : "ID do dispositivo já em uso. Tente outro ID.");
+        if ("OK-DEVID".equals(deviceResponse)) {
+            System.out.println("Device ID autenticado com sucesso.");
+        } else if ("NOK-DEVID".equals(deviceResponse)) {
+            System.out.println("ID do dispositivo já em uso. Tente outro ID.");
+        } else {
+            System.out.println("Resposta não reconhecida: " + deviceResponse);
+        }
     }
 
     private void enviarCredenciais(ObjectOutputStream outStream, String userid, String senha) throws IOException {

@@ -4,9 +4,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class IoTServer {
     private ExecutorService executorService;
@@ -39,7 +37,6 @@ public class IoTServer {
         private Socket clientSocket;
         private AuthenticationService authenticationService;
         private DeviceManager deviceManager;
-        private String username;  // Variável para armazenar o nome de usuário
 
         ClientHandlerThread(Socket socket, AuthenticationService authService, DeviceManager deviceMgr) {
             this.clientSocket = socket;
@@ -53,7 +50,7 @@ public class IoTServer {
                 ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream());
 
-                username = (String) inStream.readObject();
+                String username = (String) inStream.readObject();
                 String password = (String) inStream.readObject();
 
                 String authResponse = authenticationService.handleAuthentication(username, password);
@@ -76,7 +73,6 @@ public class IoTServer {
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Erro ao tratar cliente: " + e.getMessage());
             } finally {
-                deviceManager.removeActiveSession(username);
                 try {
                     if (clientSocket != null) {
                         clientSocket.close();
@@ -87,6 +83,9 @@ public class IoTServer {
             }
         }
     }
+
+    // ... [Incluir as classes AuthenticationService e DeviceManager aqui]
+
 
     public class AuthenticationService {
         private final String USERS_FILE = "src/users.txt";
@@ -101,13 +100,13 @@ public class IoTServer {
             String storedPassword = userCredentials.get(username);
             if (storedPassword != null) {
                 if (storedPassword.equals(password)) {
-                    return "OK-USER";
+                    return "OK-USER";  // Usuário existente autenticado com sucesso
                 } else {
-                    return "WRONG-PWD";
+                    return "WRONG-PWD"; // Senha incorreta
                 }
             } else {
                 saveNewUser(username, password);
-                return "OK-NEW-USER";
+                return "OK-NEW-USER"; // Novo usuário registrado
             }
         }
 
@@ -135,38 +134,34 @@ public class IoTServer {
         }
     }
 
+
+
     public class DeviceManager {
         private final String DEVICES_FILE = "src/devices.txt";
-        private Map<String, String> registeredDevices;
-        private Set<String> activeSessions;
+        private Map<String, String> activeDevices;
 
         public DeviceManager() {
-            registeredDevices = new HashMap<>();
-            activeSessions = new HashSet<>();
+            activeDevices = new HashMap<>();
             loadDeviceMappings();
         }
 
         public synchronized boolean isDeviceActive(String userId, String devId) {
-            return registeredDevices.getOrDefault(userId, "").equals(devId) && activeSessions.contains(userId);
+            return activeDevices.containsKey(userId) && activeDevices.get(userId).equals(devId);
         }
 
         public synchronized void registerDevice(String userId, String devId) {
-            registeredDevices.put(userId, devId);
-            activeSessions.add(userId);
+            activeDevices.put(userId, devId);
             saveDeviceMappings();
         }
 
-        public synchronized void removeActiveSession(String userId) {
-            activeSessions.remove(userId);
-        }
-
         private void loadDeviceMappings() {
+            // ... [Método de carregar os mapeamentos do arquivo, como previamente fornecido]
             try (BufferedReader reader = new BufferedReader(new FileReader(DEVICES_FILE))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String[] parts = line.split(":");
                     if (parts.length == 2) {
-                        registeredDevices.put(parts[0], parts[1]);
+                        activeDevices.put(parts[0], parts[1]);
                     }
                 }
             } catch (IOException e) {
@@ -175,8 +170,9 @@ public class IoTServer {
         }
 
         private void saveDeviceMappings() {
+            // ... [Método de salvar os mapeamentos no arquivo, como previamente fornecido]
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEVICES_FILE))) {
-                for (Map.Entry<String, String> entry : registeredDevices.entrySet()) {
+                for (Map.Entry<String, String> entry : activeDevices.entrySet()) {
                     writer.write(entry.getKey() + ":" + entry.getValue() + "\n");
                 }
             } catch (IOException e) {
@@ -184,4 +180,21 @@ public class IoTServer {
             }
         }
     }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
