@@ -44,16 +44,22 @@ public class IoTServer {
 
         @Override
         public void run() {
-            try (ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                 ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream())) {
+            try {
+                ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
+                ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream());
 
-                String username = (String) inStream.readObject();
-                String password = (String) inStream.readObject();
+                while (true) {
+                    String username = (String) inStream.readObject();
+                    String password = (String) inStream.readObject();
 
-                String response = authenticationService.handleAuthentication(username, password);
-                outStream.writeUTF(response);
-                outStream.flush();
+                    String response = authenticationService.handleAuthentication(username, password);
+                    outStream.writeUTF(response);
+                    outStream.flush();
 
+                    if (!response.equals("WRONG-PWD")) {
+                        break; // Sai do loop se não for "WRONG-PWD"
+                    }
+                }
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Erro ao tratar cliente: " + e.getMessage());
             } finally {
