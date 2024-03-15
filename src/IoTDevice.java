@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class IoTDevice {
-    private static final String USER_ID = "Erickson"; // Supondo que seja um identificador único para cada cliente
+    private static final String USER_ID = "Erickson";
     private static final String HOST = "localhost";
     private static final int PORT = 23456;
 
@@ -35,19 +35,28 @@ public class IoTDevice {
         enviarCredenciais(outStream, USER_ID, senha);
 
         String response = inStream.readUTF();
-        switch (response) {
-            case "WRONG-PWD":
-                System.out.println("Senha incorreta. Tente novamente.");
-                return false;
-            case "OK-NEW-USER":
-                System.out.println("Novo usuário registrado.");
-                return true;
-            case "OK-USER":
-                System.out.println("Usuário existente autenticado.");
-                return true;
-            default:
-                System.out.println("Resposta não reconhecida: " + response);
-                return false;
+        long serverTimestamp = inStream.readLong();
+        long localTimestamp = System.currentTimeMillis();
+
+        // Valida se o timestamp do servidor é recente em relação ao tempo local
+        if (serverTimestamp > localTimestamp - 1000) { // Ajuste a margem conforme necessário
+            switch (response) {
+                case "WRONG-PWD":
+                    System.out.println("Senha incorreta. Tente novamente.");
+                    return false;
+                case "OK-NEW-USER":
+                    System.out.println("Novo usuário registrado.");
+                    return true;
+                case "OK-USER":
+                    System.out.println("Usuário existente autenticado.");
+                    return true;
+                default:
+                    System.out.println("Resposta não reconhecida: " + response);
+                    return false;
+            }
+        } else {
+            System.out.println("Autenticação inválida. O timestamp do servidor não é recente.");
+            return false;
         }
     }
 
@@ -66,6 +75,8 @@ public class IoTDevice {
         } else {
             System.out.println("Resposta não reconhecida: " + deviceResponse);
         }
+        System.out.println("digite qualquer coisa para fechar");
+        String vaifechar=new Scanner(System.in).nextLine();
     }
 
     private void enviarCredenciais(ObjectOutputStream outStream, String userid, String senha) throws IOException {

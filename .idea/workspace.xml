@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="59e2f19e-a56c-43a1-ad01-ef5f596df3a1" name="Changes" comment="" />
+    <list default="true" id="59e2f19e-a56c-43a1-ad01-ef5f596df3a1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/IoTDevice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IoTDevice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/IoTServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IoTServer.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,7 +51,7 @@
   }
 }</component>
   <component name="RunManager" selected="Application.IoTDevice">
-    <configuration name="IoTDevice" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+    <configuration name="IoTDevice" type="Application" factoryName="Application" singleton="false" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="IoTDevice" />
       <module name="SegC-grupo02- proj1-fase1" />
       <method v="2">
@@ -61,6 +65,10 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Application.IoTDevice" />
+      <item itemvalue="Application.IoTServer" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.IoTDevice" />
@@ -88,6 +96,7 @@
       <workItem from="1710415531711" duration="85000" />
       <workItem from="1710416024583" duration="580000" />
       <workItem from="1710417128302" duration="2456000" />
+      <workItem from="1710437277260" duration="8698000" />
     </task>
     <servers />
   </component>

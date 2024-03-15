@@ -1,12 +1,10 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class IoTServer {
     private ExecutorService executorService;
@@ -17,6 +15,7 @@ public class IoTServer {
         executorService = Executors.newCachedThreadPool();
         authenticationService = new AuthenticationService();
         deviceManager = new DeviceManager();
+        startSessionCleanupThread();
     }
 
     public static void main(String[] args) {
@@ -35,11 +34,25 @@ public class IoTServer {
         }
     }
 
+    private void startSessionCleanupThread() {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(60000); // 60 segundos
+                    deviceManager.cleanupExpiredSessions();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
     class ClientHandlerThread implements Runnable {
         private Socket clientSocket;
         private AuthenticationService authenticationService;
         private DeviceManager deviceManager;
-        private String username;  // Variável para armazenar o nome de usuário
+        private String username;
+        private String devId;
 
         ClientHandlerThread(Socket socket, AuthenticationService authService, DeviceManager deviceMgr) {
             this.clientSocket = socket;
@@ -57,18 +70,21 @@ public class IoTServer {
                 String password = (String) inStream.readObject();
 
                 String authResponse = authenticationService.handleAuthentication(username, password);
+                long currentTime = System.currentTimeMillis();
                 outStream.writeUTF(authResponse);
+                outStream.writeLong(currentTime);
                 outStream.flush();
 
                 if (!authResponse.equals("OK-USER") && !authResponse.equals("OK-NEW-USER")) {
                     return;
                 }
 
-                String devId = (String) inStream.readObject();
-                if (deviceManager.isDeviceActive(username, devId)) {
+                devId = (String) inStream.readObject();
+                boolean isRegistered = deviceManager.registerDevice(username, devId);
+
+                if (!isRegistered) {
                     outStream.writeUTF("NOK-DEVID");
                 } else {
-                    deviceManager.registerDevice(username, devId);
                     outStream.writeUTF("OK-DEVID");
                 }
                 outStream.flush();
@@ -76,7 +92,9 @@ public class IoTServer {
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Erro ao tratar cliente: " + e.getMessage());
             } finally {
-                deviceManager.removeActiveSession(username);
+                if (username != null && devId != null) {
+                    deviceManager.removeActiveSession(username, devId);
+                }
                 try {
                     if (clientSocket != null) {
                         clientSocket.close();
@@ -139,25 +157,45 @@ public class IoTServer {
         private final String DEVICES_FILE = "src/devices.txt";
         private Map<String, String> registeredDevices;
         private Set<String> activeSessions;
+        private Map<String, Long> activeSessionsTimestamps;
+        private static final long TIMEOUT_THRESHOLD = 60000; // 1 minuto
+
 
         public DeviceManager() {
             registeredDevices = new HashMap<>();
             activeSessions = new HashSet<>();
+            activeSessionsTimestamps = new ConcurrentHashMap<>();
             loadDeviceMappings();
         }
 
-        public synchronized boolean isDeviceActive(String userId, String devId) {
-            return registeredDevices.getOrDefault(userId, "").equals(devId) && activeSessions.contains(userId);
-        }
+        public synchronized boolean registerDevice(String userId, String devId) {
+            String sessionKey = userId + ":" + devId;
+            long currentTime = System.currentTimeMillis();
 
-        public synchronized void registerDevice(String userId, String devId) {
+            // Verifica se o dispositivo para este userId já está registrado e ativo
+            if (activeSessions.contains(userId)) {
+                // Se já estiver ativo, nega o registro para evitar sessão simultânea
+                System.out.println("Sessão já ativa para este usuário.");
+                return false;
+            }
+
+            // Registra o dispositivo e a sessão
             registeredDevices.put(userId, devId);
-            activeSessions.add(userId);
+            activeSessions.add(userId); // Armazena apenas o userId para evitar sessões simultâneas
+            activeSessionsTimestamps.put(sessionKey, currentTime);
             saveDeviceMappings();
+            System.out.println("Dispositivo registrado com sucesso.");
+            return true;
         }
 
-        public synchronized void removeActiveSession(String userId) {
-            activeSessions.remove(userId);
+        public synchronized void removeActiveSession(String userId, String devId) {
+            activeSessions.remove(userId + ":" + devId);
+            activeSessionsTimestamps.remove(userId + ":" + devId);
+        }
+
+        public void cleanupExpiredSessions() {
+            long currentTime = System.currentTimeMillis();
+            activeSessionsTimestamps.entrySet().removeIf(entry -> currentTime - entry.getValue() > TIMEOUT_THRESHOLD);
         }
 
         private void loadDeviceMappings() {
