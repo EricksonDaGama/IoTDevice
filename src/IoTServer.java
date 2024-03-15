@@ -156,14 +156,14 @@ public class IoTServer {
     public class DeviceManager {
         private final String DEVICES_FILE = "src/devices.txt";
         private Map<String, String> registeredDevices;
-        private Set<String> activeSessions;
+        private Map<String,String> activeSessions;
         private Map<String, Long> activeSessionsTimestamps;
         private static final long TIMEOUT_THRESHOLD = 60000; // 1 minuto
 
 
         public DeviceManager() {
             registeredDevices = new HashMap<>();
-            activeSessions = new HashSet<>();
+            activeSessions = new HashMap<>();
             activeSessionsTimestamps = new ConcurrentHashMap<>();
             loadDeviceMappings();
         }
@@ -173,7 +173,7 @@ public class IoTServer {
             long currentTime = System.currentTimeMillis();
 
             // Verifica se o dispositivo para este userId já está registrado e ativo
-            if (activeSessions.contains(userId)) {
+            if (devId.equals(activeSessions.get(userId))) {
                 // Se já estiver ativo, nega o registro para evitar sessão simultânea
                 System.out.println("Sessão já ativa para este usuário.");
                 return false;
@@ -181,9 +181,9 @@ public class IoTServer {
 
             // Registra o dispositivo e a sessão
             registeredDevices.put(userId, devId);
-            activeSessions.add(userId); // Armazena apenas o userId para evitar sessões simultâneas
+            activeSessions.put(userId,devId); // Armazena apenas o userId para evitar sessões simultâneas
             activeSessionsTimestamps.put(sessionKey, currentTime);
-            saveDeviceMappings();
+            saveDeviceMappings(userId,devId);
             System.out.println("Dispositivo registrado com sucesso.");
             return true;
         }
@@ -212,11 +212,11 @@ public class IoTServer {
             }
         }
 
-        private void saveDeviceMappings() {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEVICES_FILE))) {
-                for (Map.Entry<String, String> entry : registeredDevices.entrySet()) {
-                    writer.write(entry.getKey() + ":" + entry.getValue() + "\n");
-                }
+        private void saveDeviceMappings(String userId,String deviceId) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEVICES_FILE,true))) {
+               writer.write(userId + ":" + deviceId + "\n");
+               registeredDevices.put(userId,deviceId);
+                writer.flush(); // Força a escrita dos dados no arquivo imediatamente
             } catch (IOException e) {
                 System.err.println("Erro ao escrever no arquivo de dispositivos: " + e.getMessage());
             }
