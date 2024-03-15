@@ -65,22 +65,28 @@ public class IoTDevice {
     }
 
     private void enviarDeviceId(Scanner scanner, ObjectOutputStream outStream, ObjectInputStream inStream) throws IOException {
-        System.out.println("Digite o ID do dispositivo:");
-        String devId = scanner.nextLine();
+        String deviceResponse;
+        do {
+            System.out.println("Digite o ID do dispositivo:");
+            String devId = scanner.nextLine();
 
-        outStream.writeObject(devId);
-        outStream.flush();
+            outStream.writeObject(devId);
+            outStream.flush();
 
-        String deviceResponse = inStream.readUTF();
-        if ("OK-DEVID".equals(deviceResponse)) {
-            System.out.println("Device ID autenticado com sucesso.");
-        } else if ("NOK-DEVID".equals(deviceResponse)) {
-            System.out.println("ID do dispositivo já em uso. Tente outro ID.");
-        } else {
-            System.out.println("Resposta não reconhecida: " + deviceResponse);
-        }
+            deviceResponse = inStream.readUTF();
+            if ("OK-DEVID".equals(deviceResponse)) {
+                System.out.println("Device ID autenticado com sucesso.");
+                break;
+            } else if ("NOK-DEVID".equals(deviceResponse)) {
+                System.out.println("ID do dispositivo já em uso. Tente outro ID.");
+            } else {
+                System.out.println("Resposta não reconhecida: " + deviceResponse);
+                break;
+            }
+        } while ("NOK-DEVID".equals(deviceResponse));
+
         System.out.println("digite qualquer coisa para fechar");
-        String vaifechar=new Scanner(System.in).nextLine();
+        scanner.nextLine();
     }
 
     private void enviarCredenciais(ObjectOutputStream outStream, String userid, String senha) throws IOException {

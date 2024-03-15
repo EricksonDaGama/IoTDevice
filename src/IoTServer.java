@@ -82,15 +82,19 @@ public class IoTServer {
                     }
                 }
 
-                devId = (String) inStream.readObject();
-                boolean isRegistered = deviceManager.registerDevice(username, devId);
+                boolean deviceRegistered = false;
+                while (!deviceRegistered) {
+                    devId = (String) inStream.readObject();
+                    boolean isRegistered = deviceManager.registerDevice(username, devId);
 
-                if (!isRegistered) {
-                    outStream.writeUTF("NOK-DEVID");
-                } else {
-                    outStream.writeUTF("OK-DEVID");
+                    if (!isRegistered) {
+                        outStream.writeUTF("NOK-DEVID");
+                    } else {
+                        outStream.writeUTF("OK-DEVID");
+                        deviceRegistered = true;
+                    }
+                    outStream.flush();
                 }
-                outStream.flush();
 
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Erro ao tratar cliente: " + e.getMessage());
