@@ -66,17 +66,20 @@ public class IoTServer {
                 ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream());
 
-                username = (String) inStream.readObject();
-                String password = (String) inStream.readObject();
+                boolean authenticated = false;
+                while (!authenticated) {
+                    username = (String) inStream.readObject();
+                    String password = (String) inStream.readObject();
 
-                String authResponse = authenticationService.handleAuthentication(username, password);
-                long currentTime = System.currentTimeMillis();
-                outStream.writeUTF(authResponse);
-                outStream.writeLong(currentTime);
-                outStream.flush();
+                    String authResponse = authenticationService.handleAuthentication(username, password);
+                    long currentTime = System.currentTimeMillis();
+                    outStream.writeUTF(authResponse);
+                    outStream.writeLong(currentTime);
+                    outStream.flush();
 
-                if (!authResponse.equals("OK-USER") && !authResponse.equals("OK-NEW-USER")) {
-                    return;
+                    if (authResponse.equals("OK-USER") || authResponse.equals("OK-NEW-USER")) {
+                        authenticated = true;
+                    }
                 }
 
                 devId = (String) inStream.readObject();

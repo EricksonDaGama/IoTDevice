@@ -19,9 +19,11 @@ public class IoTDevice {
              ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
              Scanner scanner = new Scanner(System.in)) {
 
-            if (autenticarUsuario(scanner, outStream, inStream)) {
-                enviarDeviceId(scanner, outStream, inStream);
+            boolean autenticado = false;
+            while (!autenticado) {
+                autenticado = autenticarUsuario(scanner, outStream, inStream);
             }
+            enviarDeviceId(scanner, outStream, inStream);
 
         } catch (IOException e) {
             System.err.println("Erro ao conectar ao servidor: " + e.getMessage());
@@ -29,21 +31,26 @@ public class IoTDevice {
     }
 
     private boolean autenticarUsuario(Scanner scanner, ObjectOutputStream outStream, ObjectInputStream inStream) throws IOException {
-        System.out.println("Digite a sua senha:");
-        String senha = scanner.nextLine();
+        while (true) { // Loop até a autenticação ser bem-sucedida ou falhar por outro motivo
+            System.out.println("Digite a sua senha:");
+            String senha = scanner.nextLine();
 
-        enviarCredenciais(outStream, USER_ID, senha);
+            enviarCredenciais(outStream, USER_ID, senha);
 
-        String response = inStream.readUTF();
-        long serverTimestamp = inStream.readLong();
-        long localTimestamp = System.currentTimeMillis();
+            String response = inStream.readUTF();
+            long serverTimestamp = inStream.readLong();
+            long localTimestamp = System.currentTimeMillis();
 
-        // Valida se o timestamp do servidor é recente em relação ao tempo local
-        if (serverTimestamp > localTimestamp - 1000) { // Ajuste a margem conforme necessário
+            // Valida se o timestamp do servidor é recente em relação ao tempo local
+            if (serverTimestamp <= localTimestamp - 1000) {
+                System.out.println("Autenticação inválida. O timestamp do servidor não é recente.");
+                return false;
+            }
+
             switch (response) {
                 case "WRONG-PWD":
                     System.out.println("Senha incorreta. Tente novamente.");
-                    return false;
+                    continue; // Permite nova tentativa
                 case "OK-NEW-USER":
                     System.out.println("Novo usuário registrado.");
                     return true;
@@ -54,9 +61,6 @@ public class IoTDevice {
                     System.out.println("Resposta não reconhecida: " + response);
                     return false;
             }
-        } else {
-            System.out.println("Autenticação inválida. O timestamp do servidor não é recente.");
-            return false;
         }
     }
 
