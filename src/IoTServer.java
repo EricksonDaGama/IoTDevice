@@ -145,17 +145,21 @@ public class IoTServer {
             // Exemplo: return "Domínio criado com sucesso";
 
             String[] parts = comando.split(" ");
-            if (parts.length != 2) {
-                return "Formato de Comando Inválido";
-            }
 
             if (parts[0].equalsIgnoreCase("CREATE")) {
+                if (parts.length != 2) {
+                    return "Formato de Comando Inválido";
+                }
                 return criarDominio(parts[1]);
             }
 
 
             if (parts[0].equalsIgnoreCase("ADD")) {
-                return "Funcionalidade ADD Não Implementada";
+                if (parts.length != 3) {
+                    return "Formato de Comando Inválido";
+                }
+
+                return adicionarUsuarioAoDominio(parts[1], parts[2]);
             }
 
             if (parts[0].equalsIgnoreCase("RD")) {
@@ -215,6 +219,91 @@ public class IoTServer {
             return false;
         }
 
+
+
+
+        private String adicionarUsuarioAoDominio(String user1, String dm) {
+            synchronized (this) { // Sincronizar o acesso ao arquivo
+                try {
+                    // Verificar se o domínio existe
+                    if (!dominioExiste(dm)) {
+                        return "NODM";  // Domínio não existe
+                    }
+
+                    // Verificar se o solicitante é o Owner do domínio
+                    if (!isOwner(dm, username)) {
+                        return "NOPERM";  // Sem permissão
+                    }
+
+                    // Verificar se o usuário a ser adicionado existe
+                    if (!authenticationService.userExists(user1)) {
+                        return "NOUSER";  // Usuário não existe
+                    }
+
+                    // Adicionar usuário ao domínio
+                    adicionarUsuarioAoArquivo(user1, dm);
+                    return "OK";  // Usuário adicionado com sucesso
+                } catch (IOException e) {
+                    System.err.println("Erro ao acessar o arquivo de domínios: " + e.getMessage());
+                    return "Erro ao adicionar usuário";
+                }
+            }
+        }
+
+
+        private boolean isOwner(String dominio, String usuario) throws IOException {
+            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("Domínio: " + dominio)) {
+                        // Ler a próxima linha para obter o Owner
+                        if ((line = br.readLine()) != null && line.contains("Owner: " + usuario)) {
+                            return true;
+                        }
+                        break;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        //Método para Adicionar Usuário ao Arquivo de Domínios:
+        private void adicionarUsuarioAoArquivo(String user1, String dm) throws IOException {
+            List<String> fileContent = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+                String line;
+                boolean found = false;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("Domínio: " + dm)) {
+                        found = true;
+                        fileContent.add(line);
+                        fileContent.add(br.readLine()); // Adiciona a linha do Owner
+                        String usuarios = br.readLine();
+                        if (!usuarios.contains(user1)) {
+                            usuarios += ", " + user1;
+                        }
+                        fileContent.add(usuarios); // Adiciona usuários atualizados
+                        continue;
+                    }
+                    if (found && line.isEmpty()) {
+                        found = false;
+                    }
+                    if (!found) {
+                        fileContent.add(line);
+                    }
+                }
+            }
+
+            // Reescrever o arquivo com o conteúdo atualizado
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/dominios.txt"))) {
+                for (String line : fileContent) {
+                    bw.write(line);
+                    bw.newLine();
+                }
+            }
+        }
+
         private boolean validarTamanhoExecutavel(String nomeArquivo, long tamanhoArquivo) {
             try {
                 File file = new File("src/executavel.txt");
@@ -259,6 +348,8 @@ public class IoTServer {
                 return "OK-NEW-USER";
             }
         }
+
+
         private void loadUserCredentials() {
             try (BufferedReader reader = new BufferedReader(new FileReader(USERS_FILE))) {
                 String line;
@@ -280,6 +371,13 @@ public class IoTServer {
                 System.err.println("Erro ao salvar novo usuário: " + e.getMessage());
             }
         }
+
+
+        //metodo utilizado quando se adiciona um usuario a um dominio.
+        public boolean userExists(String username) {
+            return userCredentials.containsKey(username);
+        }
+
     }
     public class DeviceManager {
         private Map<String, String> registeredDevices;
