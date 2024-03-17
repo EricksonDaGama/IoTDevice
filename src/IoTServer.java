@@ -58,7 +58,7 @@ public class IoTServer {
             this.clientSocket = socket;
             this.authenticationService = authService;
             this.deviceManager = deviceMgr;
-            System.out.println("Nova conexão de cliente recebida: " + socket.getInetAddress());
+            System.out.println("Cliente  conexão de cliente recebida:  " + socket.getInetAddress());
         }
 
         @Override
@@ -80,6 +80,7 @@ public class IoTServer {
                     outStream.flush();
 
                     if (authResponse.equals("OK-USER") || authResponse.equals("OK-NEW-USER")) {
+                        System.out.printf("Cliente %s iniciou secção \n",username);
                         authenticated = true;
                     }
                 }
@@ -253,7 +254,7 @@ public class IoTServer {
             registeredDevices = new HashMap<>();
             activeSessions = new HashMap<>();
             activeSessionsTimestamps = new ConcurrentHashMap<>();
-            loadDeviceMappings();
+//            loadDeviceMappings();
         }
 
         public synchronized boolean registerDevice(String userId, String devId) {
@@ -271,7 +272,7 @@ public class IoTServer {
             registeredDevices.put(userId, devId);
             activeSessions.put(userId,devId); // Armazena apenas o userId para evitar sessões simultâneas
             activeSessionsTimestamps.put(sessionKey, currentTime);
-            saveDeviceMappings(userId,devId);
+//            saveDeviceMappings(userId,devId); não é preciso guardar device-id em um ficheiro
             System.out.println("Dispositivo registrado com sucesso.");
             return true;
         }
@@ -285,28 +286,28 @@ public class IoTServer {
             long currentTime = System.currentTimeMillis();
             activeSessionsTimestamps.entrySet().removeIf(entry -> currentTime - entry.getValue() > TIMEOUT_THRESHOLD);
         }
-        private void loadDeviceMappings() {
-            try (BufferedReader reader = new BufferedReader(new FileReader(DEVICES_FILE))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(":");
-                    if (parts.length == 2) {
-                        registeredDevices.put(parts[0], parts[1]);
-                    }
-                }
-            } catch (IOException e) {
-                System.err.println("Erro ao ler o arquivo de dispositivos: " + e.getMessage());
-            }
-        }
-        private void saveDeviceMappings(String userId,String deviceId) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEVICES_FILE,true))) {
-               writer.write(userId + ":" + deviceId + "\n");
-               registeredDevices.put(userId,deviceId);
-                writer.flush(); // Força a escrita dos dados no arquivo imediatamente
-            } catch (IOException e) {
-                System.err.println("Erro ao escrever no arquivo de dispositivos: " + e.getMessage());
-            }
-        }
+//        private void loadDeviceMappings() {
+//            try (BufferedReader reader = new BufferedReader(new FileReader(DEVICES_FILE))) {
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    String[] parts = line.split(":");
+//                    if (parts.length == 2) {
+//                        registeredDevices.put(parts[0], parts[1]);
+//                    }
+//                }
+//            } catch (IOException e) {
+//                System.err.println("Erro ao ler o arquivo de dispositivos: " + e.getMessage());
+//            }
+//        }
+//        private void saveDeviceMappings(String userId,String deviceId) {
+//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEVICES_FILE,true))) {
+//               writer.write(userId + ":" + deviceId + "\n");
+//               registeredDevices.put(userId,deviceId);
+//                writer.flush(); // Força a escrita dos dados no arquivo imediatamente
+//            } catch (IOException e) {
+//                System.err.println("Erro ao escrever no arquivo de dispositivos: " + e.getMessage());
+//            }
+//        }
 
     }
 }
