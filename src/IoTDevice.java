@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class IoTDevice {
     private static final String USER_ID = "Rodrigo";  //"Rodrigo"; // "Barata" //"Erickson"
     private static final String HOST = "localhost";
-    private static final int PORT = 23456;
+    private static final int PORT = 23456; //apagar
 
     public static void main(String[] args) {
         new IoTDevice().iniciarCliente();

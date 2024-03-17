@@ -39,7 +39,7 @@
     "Application.IoTServer.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "device-id",
+    "git-widget-placeholder": "executave/menu",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src",
     "node.js.detected.package.eslint": "true",
@@ -102,7 +102,7 @@
       <workItem from="1710415531711" duration="85000" />
       <workItem from="1710416024583" duration="580000" />
       <workItem from="1710417128302" duration="2456000" />
-      <workItem from="1710437277260" duration="30483000" />
+      <workItem from="1710437277260" duration="30906000" />
     </task>
     <servers />
   </component>
