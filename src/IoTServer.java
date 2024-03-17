@@ -58,6 +58,7 @@ public class IoTServer {
             this.clientSocket = socket;
             this.authenticationService = authService;
             this.deviceManager = deviceMgr;
+            System.out.println("Nova conexão de cliente recebida: " + socket.getInetAddress());
         }
 
         @Override
@@ -66,6 +67,7 @@ public class IoTServer {
                 ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream());
 
+                //1-recebendo dados do cliente
                 boolean authenticated = false;
                 while (!authenticated) {
                     username = (String) inStream.readObject();
@@ -81,7 +83,7 @@ public class IoTServer {
                         authenticated = true;
                     }
                 }
-
+                //2-recebendo dados do device-id
                 boolean deviceRegistered = false;
                 while (!deviceRegistered) {
                     devId = (String) inStream.readObject();
@@ -96,9 +98,38 @@ public class IoTServer {
                     outStream.flush();
                 }
 
+                //3-Recebendo dados do executável
+                String nomeArquivo = inStream.readUTF();
+                long tamanhoArquivo = inStream.readLong();
+
+                if (validarTamanhoExecutavel(nomeArquivo, tamanhoArquivo)) {
+                    outStream.writeUTF("OK-TESTED");
+                } else {
+                    outStream.writeUTF("NOK-TESTED");
+                    //return;
+                }
+                outStream.flush();
+
+
+
+                //4- recebendo o comando que o cliente quer
+                while (!clientSocket.isClosed()) {
+                    try {
+                        String comando = inStream.readUTF();
+                        String resposta = processarComando(comando);
+                        outStream.writeUTF(resposta);
+                        outStream.flush();
+                    } catch (IOException e) {
+                        System.err.println("Erro ao ler comando: " + e.getMessage());
+                        break;  // Sair do loop em caso de erro
+                    }
+                }
+
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Erro ao tratar cliente: " + e.getMessage());
+                // Tratar a exceção conforme necessário
             } finally {
+                // A lógica de limpeza e fechamento do socket
                 if (username != null && devId != null) {
                     deviceManager.removeActiveSession(username, devId);
                 }
@@ -111,6 +142,54 @@ public class IoTServer {
                 }
             }
         }
+        private String processarComando(String comando) {
+            // Analise o comando e execute a ação correspondente
+            // Por exemplo, se o comando for "CREATE <dm>", crie um novo domínio
+            // Retorne uma resposta baseada no resultado da ação
+            // Exemplo: return "Domínio criado com sucesso";
+
+            if (comando.equalsIgnoreCase("CREATE"))
+                return "Funcionalidade Create Não Implementada";
+            if (comando.equalsIgnoreCase("ADD"))
+                return "Funcionalidade ADD Não Implementada";
+            if (comando.equalsIgnoreCase("RD"))
+                return "Funcionalidade RD Não Implementada";
+            if (comando.equalsIgnoreCase("ET"))
+                return "Funcionalidade ET Não Implementada";
+            if (comando.equalsIgnoreCase("EI"))
+                return "Funcionalidade EI Não Implementada";
+            if (comando.equalsIgnoreCase("RT"))
+                return "Funcionalidade RT Não Implementada";
+            if (comando.equalsIgnoreCase("RI"))
+                return "Funcionalidade RI Não Implementada";
+
+            return "Comando Desconhecido";
+
+        }
+        private boolean validarTamanhoExecutavel(String nomeArquivo, long tamanhoArquivo) {
+            try {
+                File file = new File("src/executavel.txt");
+                System.out.println("tamanho que o cliente diz "+tamanhoArquivo);
+                System.out.println("o nome do arquivo é "+nomeArquivo);
+
+                Scanner scanner = new Scanner(file);
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    String[] parts = line.split(":");
+                    if (parts[0].equals(nomeArquivo)) {
+                        long tamanhoEsperado = Long.parseLong(parts[1]);
+                        System.out.println("tamanho esperado "+tamanhoEsperado);
+                        return tamanhoArquivo == tamanhoEsperado;
+                    }
+                }
+            } catch (FileNotFoundException | NumberFormatException e) {
+                System.err.println("Erro ao validar tamanho do arquivo: " + e.getMessage());
+            }
+            return false;
+        }
+
+
+
     }
 
     public class AuthenticationService {
@@ -158,6 +237,8 @@ public class IoTServer {
                 System.err.println("Erro ao salvar novo usuário: " + e.getMessage());
             }
         }
+
+
     }
 
     public class DeviceManager {
@@ -204,7 +285,6 @@ public class IoTServer {
             long currentTime = System.currentTimeMillis();
             activeSessionsTimestamps.entrySet().removeIf(entry -> currentTime - entry.getValue() > TIMEOUT_THRESHOLD);
         }
-
         private void loadDeviceMappings() {
             try (BufferedReader reader = new BufferedReader(new FileReader(DEVICES_FILE))) {
                 String line;
@@ -218,7 +298,6 @@ public class IoTServer {
                 System.err.println("Erro ao ler o arquivo de dispositivos: " + e.getMessage());
             }
         }
-
         private void saveDeviceMappings(String userId,String deviceId) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEVICES_FILE,true))) {
                writer.write(userId + ":" + deviceId + "\n");
@@ -228,5 +307,6 @@ public class IoTServer {
                 System.err.println("Erro ao escrever no arquivo de dispositivos: " + e.getMessage());
             }
         }
+
     }
 }
