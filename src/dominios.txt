@@ -17,3 +17,5 @@ Dispositivos registrados: emma:7, lucas:8
 Domínio: Room01
 Owner: Rodrigo
 Usuários com permissão: Rodrigo
+Dispositivos registrados: Rodrigo:1
+

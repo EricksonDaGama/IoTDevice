@@ -163,7 +163,11 @@ public class IoTServer {
             }
 
             if (parts[0].equalsIgnoreCase("RD")) {
-                return "Funcionalidade ADD Não Implementada";
+                if (parts.length != 2) {
+                    return "Formato de Comando Inválido";
+                }
+                return registrarDispositivoNoDominio(parts[1]);
+
             }
             if (parts[0].equalsIgnoreCase("ET")) {
                 return "Funcionalidade ADD Não Implementada";
@@ -303,6 +307,82 @@ public class IoTServer {
                 }
             }
         }
+
+
+        private String registrarDispositivoNoDominio(String dm) {
+            synchronized (this) {
+                try {
+                    if (!dominioExiste(dm)) {
+                        return "NODM";  // O domínio não existe
+                    }
+                    if (!isUserAllowed(dm, username)) {
+                        return "NOPERM";  // O usuário não tem permissão
+                    }
+                    registrarDispositivoNoArquivo(dm);
+                    return "OK";
+                } catch (IOException e) {
+                    System.err.println("Erro ao acessar o arquivo de domínios: " + e.getMessage());
+                    return "Erro ao registrar dispositivo";
+                }
+            }
+        }
+
+        /**
+         * erifica se um usuário tem permissão para registrar um dispositivo em um domínio específico.
+         * Para isso, ela lê o arquivo dominios.txt e verifica se o
+         * usuário está listado como tendo permissão para esse domínio.
+         * @param dm
+         * @param username
+         * @return
+         * @throws IOException
+         */
+        private boolean isUserAllowed(String dm, String username) throws IOException {
+            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+                String line;
+                boolean isCurrentDomain = false;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("Domínio: " + dm)) {
+                        isCurrentDomain = true;
+                    } else if (isCurrentDomain && line.contains("Usuários com permissão:")) {
+                        return line.contains(username);
+                    } else if (line.startsWith("Domínio:")) {
+                        isCurrentDomain = false;
+                    }
+                }
+            }
+            return false; // Retorna falso se o domínio não foi encontrado ou o usuário não tem permissão
+        }
+
+
+        private void registrarDispositivoNoArquivo(String dm) throws IOException {
+            // A lógica abaixo é simplificada e pode precisar ser adaptada para o seu caso específico
+            List<String> lines = new ArrayList<>();
+            String dispositivo = username + ":" + devId;
+
+            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+                String line;
+                boolean foundDomain = false;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("Domínio: " + dm)) {
+                        foundDomain = true;
+                    }
+                    if (foundDomain && line.startsWith("Dispositivos registrados:")) {
+                        line += " " + dispositivo; // Adiciona o dispositivo na linha atual
+                        foundDomain = false; // Evita adicionar o dispositivo em linhas subsequentes
+                    }
+                    lines.add(line);
+                }
+            }
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/dominios.txt"))) {
+                for (String line : lines) {
+                    bw.write(line);
+                    bw.newLine();
+                }
+            }
+        }
+
+
 
         private boolean validarTamanhoExecutavel(String nomeArquivo, long tamanhoArquivo) {
             try {
