@@ -53,14 +53,12 @@ public class IoTServer {
         private DeviceManager deviceManager;
         private String username;
         private String devId;
-
         ClientHandlerThread(Socket socket, AuthenticationService authService, DeviceManager deviceMgr) {
             this.clientSocket = socket;
             this.authenticationService = authService;
             this.deviceManager = deviceMgr;
             System.out.println("Cliente  conexão de cliente recebida:  " + socket.getInetAddress());
         }
-
         @Override
         public void run() {
             try {
@@ -98,7 +96,6 @@ public class IoTServer {
                     }
                     outStream.flush();
                 }
-
                 //3-Recebendo dados do executável
                 String nomeArquivo = inStream.readUTF();
                 long tamanhoArquivo = inStream.readLong();
@@ -110,8 +107,6 @@ public class IoTServer {
                     //return;
                 }
                 outStream.flush();
-
-
 
                 //4- recebendo o comando que o cliente quer
                 while (!clientSocket.isClosed()) {
@@ -149,24 +144,77 @@ public class IoTServer {
             // Retorne uma resposta baseada no resultado da ação
             // Exemplo: return "Domínio criado com sucesso";
 
-            if (comando.equalsIgnoreCase("CREATE"))
-                return "Funcionalidade Create Não Implementada";
-            if (comando.equalsIgnoreCase("ADD"))
+            String[] parts = comando.split(" ");
+            if (parts.length != 2) {
+                return "Formato de Comando Inválido";
+            }
+
+            if (parts[0].equalsIgnoreCase("CREATE")) {
+                return criarDominio(parts[1]);
+            }
+
+
+            if (parts[0].equalsIgnoreCase("ADD")) {
                 return "Funcionalidade ADD Não Implementada";
-            if (comando.equalsIgnoreCase("RD"))
-                return "Funcionalidade RD Não Implementada";
-            if (comando.equalsIgnoreCase("ET"))
-                return "Funcionalidade ET Não Implementada";
-            if (comando.equalsIgnoreCase("EI"))
-                return "Funcionalidade EI Não Implementada";
-            if (comando.equalsIgnoreCase("RT"))
-                return "Funcionalidade RT Não Implementada";
-            if (comando.equalsIgnoreCase("RI"))
-                return "Funcionalidade RI Não Implementada";
+            }
+
+            if (parts[0].equalsIgnoreCase("RD")) {
+                return "Funcionalidade ADD Não Implementada";
+            }
+            if (parts[0].equalsIgnoreCase("ET")) {
+                return "Funcionalidade ADD Não Implementada";
+            }
+            if (parts[0].equalsIgnoreCase("EI")) {
+                return "Funcionalidade ADD Não Implementada";
+            }
+
+            if (parts[0].equalsIgnoreCase("RT")) {
+                return "Funcionalidade ADD Não Implementada";
+            }
+            if (parts[0].equalsIgnoreCase("RI")) {
+                return "Funcionalidade ADD Não Implementada";
+            }
+
 
             return "Comando Desconhecido";
 
         }
+
+
+        private String criarDominio(String nomeDominio) {
+            // Implementar lógica para criar um domínio
+            synchronized (this) { // Sincronizar o acesso ao arquivo
+                try {
+                    // Verificar se o domínio já existe
+                    if (dominioExiste(nomeDominio)) {
+                        return "NOK";  // Domínio já existe
+                    }
+
+                    // Adicionar o novo domínio ao arquivo
+                    try (FileWriter fw = new FileWriter("src/dominios.txt", true);
+                         BufferedWriter bw = new BufferedWriter(fw)) {
+                        bw.write("\nDomínio: " + nomeDominio + "\nOwner: " + username + "\nUsuários com permissão: " + username + "\nDispositivos registrados: \n");
+                    }
+                    return "OK";  // Domínio criado com sucesso
+                } catch (IOException e) {
+                    System.err.println("Erro ao acessar o arquivo de domínios: " + e.getMessage());
+                    return "Erro ao criar o domínio";
+                }
+            }
+        }
+
+        private boolean dominioExiste(String nomeDominio) throws IOException {
+            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("Domínio: " + nomeDominio)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         private boolean validarTamanhoExecutavel(String nomeArquivo, long tamanhoArquivo) {
             try {
                 File file = new File("src/executavel.txt");
@@ -188,9 +236,6 @@ public class IoTServer {
             }
             return false;
         }
-
-
-
     }
 
     public class AuthenticationService {
@@ -201,7 +246,6 @@ public class IoTServer {
             userCredentials = new HashMap<>();
             loadUserCredentials();
         }
-
         public String handleAuthentication(String username, String password) {
             String storedPassword = userCredentials.get(username);
             if (storedPassword != null) {
@@ -215,7 +259,6 @@ public class IoTServer {
                 return "OK-NEW-USER";
             }
         }
-
         private void loadUserCredentials() {
             try (BufferedReader reader = new BufferedReader(new FileReader(USERS_FILE))) {
                 String line;
@@ -229,7 +272,6 @@ public class IoTServer {
                 System.err.println("Erro ao ler o arquivo de credenciais: " + e.getMessage());
             }
         }
-
         private void saveNewUser(String username, String password) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(USERS_FILE, true))) {
                 writer.write(username + ":" + password + "\n");
@@ -238,76 +280,40 @@ public class IoTServer {
                 System.err.println("Erro ao salvar novo usuário: " + e.getMessage());
             }
         }
-
-
     }
-
     public class DeviceManager {
-        private final String DEVICES_FILE = "src/devices.txt";
         private Map<String, String> registeredDevices;
         private Map<String,String> activeSessions;
         private Map<String, Long> activeSessionsTimestamps;
         private static final long TIMEOUT_THRESHOLD = 60000; // 1 minuto
-
-
         public DeviceManager() {
             registeredDevices = new HashMap<>();
             activeSessions = new HashMap<>();
             activeSessionsTimestamps = new ConcurrentHashMap<>();
-//            loadDeviceMappings();
         }
-
         public synchronized boolean registerDevice(String userId, String devId) {
             String sessionKey = userId + ":" + devId;
             long currentTime = System.currentTimeMillis();
-
             // Verifica se o dispositivo para este userId já está registrado e ativo
             if (devId.equals(activeSessions.get(userId))) {
                 // Se já estiver ativo, nega o registro para evitar sessão simultânea
                 System.out.println("Sessão já ativa para este usuário.");
                 return false;
             }
-
             // Registra o dispositivo e a sessão
             registeredDevices.put(userId, devId);
             activeSessions.put(userId,devId); // Armazena apenas o userId para evitar sessões simultâneas
             activeSessionsTimestamps.put(sessionKey, currentTime);
-//            saveDeviceMappings(userId,devId); não é preciso guardar device-id em um ficheiro
             System.out.println("Dispositivo registrado com sucesso.");
             return true;
         }
-
         public synchronized void removeActiveSession(String userId, String devId) {
             activeSessions.remove(userId + ":" + devId);
             activeSessionsTimestamps.remove(userId + ":" + devId);
         }
-
         public void cleanupExpiredSessions() {
             long currentTime = System.currentTimeMillis();
             activeSessionsTimestamps.entrySet().removeIf(entry -> currentTime - entry.getValue() > TIMEOUT_THRESHOLD);
         }
-//        private void loadDeviceMappings() {
-//            try (BufferedReader reader = new BufferedReader(new FileReader(DEVICES_FILE))) {
-//                String line;
-//                while ((line = reader.readLine()) != null) {
-//                    String[] parts = line.split(":");
-//                    if (parts.length == 2) {
-//                        registeredDevices.put(parts[0], parts[1]);
-//                    }
-//                }
-//            } catch (IOException e) {
-//                System.err.println("Erro ao ler o arquivo de dispositivos: " + e.getMessage());
-//            }
-//        }
-//        private void saveDeviceMappings(String userId,String deviceId) {
-//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEVICES_FILE,true))) {
-//               writer.write(userId + ":" + deviceId + "\n");
-//               registeredDevices.put(userId,deviceId);
-//                writer.flush(); // Força a escrita dos dados no arquivo imediatamente
-//            } catch (IOException e) {
-//                System.err.println("Erro ao escrever no arquivo de dispositivos: " + e.getMessage());
-//            }
-//        }
-
     }
 }

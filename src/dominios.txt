@@ -1,0 +1,15 @@
+Domínio: Home01
+Owner: jose
+Usuários com permissão: jose, luis, manel, alan
+Dispositivos registrados: alan:2, alan:5, luis:3, luis:6
+
+Domínio: Office02
+Owner: carlos
+Usuários com permissão: carlos, anne
+Dispositivos registrados: carlos:1, anne:4
+
+Domínio: Kitchen03
+Owner: emma
+Usuários com permissão: emma, lucas
+Dispositivos registrados: emma:7, lucas:8
+
