@@ -170,7 +170,7 @@ public class IoTServer {
 
             }
             if (parts[0].equalsIgnoreCase("ET")) {
-                return "Funcionalidade ADD Não Implementada";
+                return handleTemperatureUpdate(parts);
             }
             if (parts[0].equalsIgnoreCase("EI")) {
                 return "Funcionalidade ADD Não Implementada";
@@ -187,6 +187,24 @@ public class IoTServer {
             return "Comando Desconhecido";
 
         }
+
+        private String handleTemperatureUpdate(String[] partes) {
+            if (partes.length != 2) {
+                return "NOK"; // Formato de comando inválido
+            }
+            try {
+                float temperatura = Float.parseFloat(partes[1]);
+                if (deviceManager.isDeviceRegistered(username, devId)) {
+                    return deviceManager.updateDeviceTemperature(username, devId, temperatura) ? "OK" : "NOK";
+                }
+            } catch (NumberFormatException e) {
+                return "NOK"; // Formato de temperatura inválido
+            }
+            return "NOK"; // Dispositivo não registrado ou outro erro
+        }
+
+
+
 
 
         private String criarDominio(String nomeDominio) {
@@ -493,5 +511,106 @@ public class IoTServer {
             long currentTime = System.currentTimeMillis();
             activeSessionsTimestamps.entrySet().removeIf(entry -> currentTime - entry.getValue() > TIMEOUT_THRESHOLD);
         }
+
+        public synchronized boolean updateDeviceTemperature(String username, String devId, float temperatura) {
+            Map<String, String> devices = loadDevices();
+            String dispositivoKey = username + ":" + devId;
+
+            devices.put(dispositivoKey, "Última Temperatura: " + temperatura + "°C");
+
+            return saveDevices(devices);
+        }
+
+
+        private Map<String, String> loadDevices() {
+            Map<String, String> devices = new HashMap<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader("src/devices.txt"))) {
+                String line;
+                String currentDevice = null;
+
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().startsWith("Dispositivo:")) {
+                        currentDevice = line.substring(line.indexOf(':') + 1).trim();
+                    } else if (line.trim().startsWith("Última Temperatura:") && currentDevice != null) {
+                        devices.put(currentDevice, line.substring(line.indexOf(':') + 1).trim());
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return devices;
+        }
+
+        private boolean saveDevices(Map<String, String> devices) {
+            // Lista para armazenar todas as linhas do arquivo
+            List<String> fileContent = new ArrayList<>();
+
+            try (BufferedReader br = new BufferedReader(new FileReader("src/devices.txt"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    fileContent.add(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            // Atualizar a lista com as novas temperaturas dos dispositivos
+            for (Map.Entry<String, String> entry : devices.entrySet()) {
+                String dispositivoKey = "Dispositivo: " + entry.getKey();
+                boolean found = false;
+
+                for (int i = 0; i < fileContent.size(); i++) {
+                    if (fileContent.get(i).equals(dispositivoKey)) {
+                        // Se encontrou o dispositivo, atualiza a próxima linha com a temperatura
+                        if (i + 1 < fileContent.size()) {
+                            fileContent.set(i + 1, entry.getValue());
+                        } else {
+                            fileContent.add(entry.getValue());
+                        }
+                        found = true;
+                        break;
+                    }
+                }
+
+                // Se o dispositivo não foi encontrado, adicione-o ao final do arquivo
+                if (!found) {
+                    fileContent.add(dispositivoKey);
+                    fileContent.add(entry.getValue());
+                }
+            }
+
+            // Escrever todas as linhas de volta no arquivo
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/devices.txt"))) {
+                for (String fileLine : fileContent) {
+                    bw.write(fileLine);
+                    bw.newLine();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            return true;
+        }
+
+
+        public synchronized boolean isDeviceRegistered(String username, String devId) {
+            String dispositivoKey = username + ":" + devId;
+            try (BufferedReader reader = new BufferedReader(new FileReader("src/dominios.txt"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().startsWith("Dispositivos registrados:")) {
+                        if (line.contains(dispositivoKey)) {
+                            return true;
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
     }
 }

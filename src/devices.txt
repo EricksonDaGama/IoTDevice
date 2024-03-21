@@ -1,0 +1,4 @@
+Dispositivo: Rodrigo:1
+30.0°C
+Dispositivo: Erickson:1
+Última Temperatura: 20.0°C

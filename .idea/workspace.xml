@@ -36,10 +36,11 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.IoTDevice.executor": "Run",
+    "Application.IoTServer (1).executor": "Run",
     "Application.IoTServer.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "add-user-dominio",
+    "git-widget-placeholder": "enviar-temp",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src",
     "node.js.detected.package.eslint": "true",
@@ -64,6 +65,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="IoTServer (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="IoTServer" />
+      <module name="SegC-grupo02- proj1-fase1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="IoTServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="IoTServer" />
       <module name="SegC-grupo02- proj1-fase1" />
@@ -72,12 +80,14 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.IoTServer (1)" />
       <item itemvalue="Application.IoTDevice" />
       <item itemvalue="Application.IoTServer" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.IoTDevice" />
+        <item itemvalue="Application.IoTServer (1)" />
         <item itemvalue="Application.IoTServer" />
       </list>
     </recent_temporary>
@@ -102,7 +112,9 @@
       <workItem from="1710415531711" duration="85000" />
       <workItem from="1710416024583" duration="580000" />
       <workItem from="1710417128302" duration="2456000" />
-      <workItem from="1710437277260" duration="41057000" />
+      <workItem from="1710437277260" duration="45395000" />
+      <workItem from="1711014957070" duration="146000" />
+      <workItem from="1711026937985" duration="16364000" />
     </task>
     <servers />
   </component>

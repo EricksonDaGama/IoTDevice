@@ -1,1 +1,1 @@
-IoTDevice.class:6603
+IoTDevice.class:6604
