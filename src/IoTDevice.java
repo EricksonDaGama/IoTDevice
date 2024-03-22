@@ -92,9 +92,11 @@ public class IoTDevice {
 
             deviceResponse = inStream.readUTF();
             if ("OK-DEVID".equals(deviceResponse)) {
+                System.out.println(deviceResponse);
                 System.out.println("Device ID autenticado com sucesso.");
                 break;
             } else if ("NOK-DEVID".equals(deviceResponse)) {
+                System.out.println(deviceResponse);
                 System.out.println("ID do dispositivo já em uso. Tente outro ID.");
             } else {
                 System.out.println("Resposta não reconhecida: " + deviceResponse);
@@ -124,9 +126,11 @@ public class IoTDevice {
         outStream.flush();
         String respostaTeste = inStream.readUTF();
         if ("NOK-TESTED".equals(respostaTeste)) {
+            System.err.println(respostaTeste);
             System.err.println("Erro: Programa não validado pelo servidor.");
             System.exit(1);  // Encerra o programa
         } else if ("OK-TESTED".equals(respostaTeste)) {
+            System.out.println(respostaTeste);
             System.out.println("Programa validado pelo" +
                     " servidor.");
             // Processo continua após a validação
@@ -145,11 +149,65 @@ public class IoTDevice {
     }
     //processar o comando inserido pelo cliente e enviar ao servidor metodo pequeno
     private void processarComando(String comando, ObjectOutputStream outStream, ObjectInputStream inStream) throws IOException {
-        // Implemente a lógica para processar cada comando aqui
-        // Por exemplo, se o comando for "CREATE <dm>", envie a informação relevante para o servidor
-        outStream.writeUTF(comando);
+        if (comando.toUpperCase().startsWith("EI ")) {
+            String filename = comando.substring(3);
+            enviarImagem(filename, outStream);
+
+            // Recebendo a resposta do servidor
+            String resposta = inStream.readUTF();
+            System.out.println("Resposta do Servidor: " + resposta);
+        } else {
+            // Processamento dos outros comandos
+            outStream.writeUTF(comando);
+            outStream.flush();
+
+            // Recebendo a resposta do servidor
+            String resposta = inStream.readUTF();
+            System.out.println("Resposta do Servidor: " + resposta);
+        }
+    }
+
+//    String path = "src/"+filename; //filename=Erickson1_03-22-24";
+//
+//
+//    File file = new File(path);
+//        if (!file.exists()) {
+//        System.out.println("Arquivo não encontrado: " + filename);
+//        return;
+//    }
+
+    private void enviarImagem(String filename, ObjectOutputStream outStream) throws IOException {
+
+        String path = "src/"+filename; //filename=Erickson1_03-22-24";
+
+
+        File file = new File(path);
+            if (!file.exists()) {
+            System.out.println("Arquivo não encontrado: " + filename);
+            return;
+        }
+
+
+        long fileSize = file.length();
+
+        // Enviando comando e nome do arquivo
+        outStream.writeUTF("EI " + filename);
+
+        // Enviando o tamanho do arquivo
+        outStream.writeLong(fileSize);
+
+        // Enviando o arquivo
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+        }
         outStream.flush();
     }
+
+
 
 
 }

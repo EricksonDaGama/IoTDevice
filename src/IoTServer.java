@@ -1,10 +1,15 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
 
 public class IoTServer {
     private ExecutorService executorService;
@@ -112,9 +117,12 @@ public class IoTServer {
                 while (!clientSocket.isClosed()) {
                     try {
                         String comando = inStream.readUTF();
-                        String resposta = processarComando(comando);
+                        String resposta = processarComando(comando,inStream);
+
+                        System.out.println("agora vou enviar a resposta ao cliente sobre a imagem a resposta sera"+ resposta);
                         outStream.writeUTF(resposta);
                         outStream.flush();
+                        System.out.println("enviei a resposta ");
                     } catch (IOException e) {
                         System.err.println("Erro ao ler comando: " + e.getMessage());
                         break;  // Sair do loop em caso de erro
@@ -138,7 +146,7 @@ public class IoTServer {
                 }
             }
         }
-        private String processarComando(String comando) {
+        private String processarComando(String comando,ObjectInputStream inStream) {
             // Analise o comando e execute a ação correspondente
             // Por exemplo, se o comando for "CREATE <dm>", crie um novo domínio
             // Retorne uma resposta baseada no resultado da ação
@@ -173,7 +181,8 @@ public class IoTServer {
                 return handleTemperatureUpdate(parts);
             }
             if (parts[0].equalsIgnoreCase("EI")) {
-                return "Funcionalidade ADD Não Implementada";
+                return handleImageUpload(parts,inStream);
+
             }
 
             if (parts[0].equalsIgnoreCase("RT")) {
@@ -187,6 +196,49 @@ public class IoTServer {
             return "Comando Desconhecido";
 
         }
+
+        private String handleImageUpload(String[] partes, ObjectInputStream inStream) {
+            if (partes.length != 2) {
+                return "NOK"; // Formato de comando inválido
+            }
+
+            try {
+                String filename = partes[1];
+                long fileSize = inStream.readLong();
+                byte[] imageBytes = new byte[(int) fileSize];
+                int readBytes = 0;
+                while (readBytes < fileSize) {
+                    int result = inStream.read(imageBytes, readBytes, imageBytes.length - readBytes);
+                    if (result == -1) {
+                        break; // EOF
+                    }
+                    readBytes += result;
+                }
+
+                Path directoryPath = Paths.get("src/dadosSensoriasClientes/");
+                Path filePath = directoryPath.resolve(filename);
+
+                if (!Files.exists(directoryPath)) {
+                    Files.createDirectories(directoryPath);
+                }
+
+                // Usando try-with-resources para garantir que o stream seja fechado
+                try (OutputStream os = Files.newOutputStream(filePath, StandardOpenOption.CREATE)) {
+                    os.write(imageBytes);
+                }
+
+                if (deviceManager.isDeviceRegistered(username, devId)) {
+                    return deviceManager.updateDeviceImage(username, devId, filename) ? "OK" : "NOK";
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return "NOK"; // Falha no upload ou outro erro
+        }
+
+
+
+        //Files.write(Paths.get("src/dadosSensoriasClientes/" + filename), imageBytes);
 
         private String handleTemperatureUpdate(String[] partes) {
             if (partes.length != 2) {
@@ -202,8 +254,6 @@ public class IoTServer {
             }
             return "NOK"; // Dispositivo não registrado ou outro erro
         }
-
-
 
 
 
@@ -400,8 +450,6 @@ public class IoTServer {
             }
         }
 
-
-
         private boolean validarTamanhoExecutavel(String nomeArquivo, long tamanhoArquivo) {
             try {
                 File file = new File("src/executavel.txt");
@@ -513,27 +561,57 @@ public class IoTServer {
         }
 
         public synchronized boolean updateDeviceTemperature(String username, String devId, float temperatura) {
-            Map<String, String> devices = loadDevices();
+            Map<String, DeviceData> devices = loadDevices();
             String dispositivoKey = username + ":" + devId;
 
-            devices.put(dispositivoKey, "Última Temperatura: " + temperatura + "°C");
+            DeviceData data = devices.getOrDefault(dispositivoKey, new DeviceData(null, ""));
+            data.temperatura = temperatura; // Atualiza a temperatura
+            devices.put(dispositivoKey, data);
 
             return saveDevices(devices);
         }
 
 
-        private Map<String, String> loadDevices() {
-            Map<String, String> devices = new HashMap<>();
+        public synchronized boolean updateDeviceImage(String username, String devId, String filename) {
+            Map<String, DeviceData> devices = loadDevices();
+            String dispositivoKey = username + ":" + devId;
+
+            DeviceData data = devices.getOrDefault(dispositivoKey, new DeviceData(null, ""));
+            data.imagem = filename;
+            devices.put(dispositivoKey, data);
+
+            return saveDevices(devices);
+        }
+
+
+
+        private Map<String, DeviceData> loadDevices() {
+            Map<String, DeviceData> devices = new HashMap<>();
             try (BufferedReader reader = new BufferedReader(new FileReader("src/devices.txt"))) {
                 String line;
                 String currentDevice = null;
+                DeviceData currentData = null;
 
                 while ((line = reader.readLine()) != null) {
                     if (line.trim().startsWith("Dispositivo:")) {
+                        if (currentDevice != null && currentData != null) {
+                            devices.put(currentDevice, currentData);
+                        }
                         currentDevice = line.substring(line.indexOf(':') + 1).trim();
-                    } else if (line.trim().startsWith("Última Temperatura:") && currentDevice != null) {
-                        devices.put(currentDevice, line.substring(line.indexOf(':') + 1).trim());
+                        currentData = new DeviceData(null, ""); // Reset para novo dispositivo
+                    } else if (line.trim().startsWith("Última Temperatura:")) {
+                        if (currentData != null) {
+                            String tempStr = line.substring(line.indexOf(':') + 1).trim();
+                            currentData.temperatura = tempStr.isEmpty() ? null : Float.parseFloat(tempStr);
+                        }
+                    } else if (line.trim().startsWith("Última Imagem:")) {
+                        if (currentData != null) {
+                            currentData.imagem = line.substring(line.indexOf(':') + 1).trim();
+                        }
                     }
+                }
+                if (currentDevice != null && currentData != null) {
+                    devices.put(currentDevice, currentData); // Adiciona o último dispositivo lido
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -541,8 +619,8 @@ public class IoTServer {
             return devices;
         }
 
-        private boolean saveDevices(Map<String, String> devices) {
-            // Lista para armazenar todas as linhas do arquivo
+
+        private boolean saveDevices(Map<String, DeviceData> devices) {
             List<String> fileContent = new ArrayList<>();
 
             try (BufferedReader br = new BufferedReader(new FileReader("src/devices.txt"))) {
@@ -555,28 +633,23 @@ public class IoTServer {
                 return false;
             }
 
-            // Atualizar a lista com as novas temperaturas dos dispositivos
-            for (Map.Entry<String, String> entry : devices.entrySet()) {
+            for (Map.Entry<String, DeviceData> entry : devices.entrySet()) {
                 String dispositivoKey = "Dispositivo: " + entry.getKey();
-                boolean found = false;
+                int deviceIndex = -1;
 
+                // Procura o dispositivo no arquivo
                 for (int i = 0; i < fileContent.size(); i++) {
                     if (fileContent.get(i).equals(dispositivoKey)) {
-                        // Se encontrou o dispositivo, atualiza a próxima linha com a temperatura
-                        if (i + 1 < fileContent.size()) {
-                            fileContent.set(i + 1, entry.getValue());
-                        } else {
-                            fileContent.add(entry.getValue());
-                        }
-                        found = true;
+                        deviceIndex = i;
                         break;
                     }
                 }
 
-                // Se o dispositivo não foi encontrado, adicione-o ao final do arquivo
-                if (!found) {
-                    fileContent.add(dispositivoKey);
-                    fileContent.add(entry.getValue());
+                // Se encontrou, atualiza os dados; se não, adiciona
+                if (deviceIndex != -1) {
+                    updateDeviceData(fileContent, deviceIndex, entry.getValue());
+                } else {
+                    addNewDeviceData(fileContent, dispositivoKey, entry.getValue());
                 }
             }
 
@@ -593,6 +666,20 @@ public class IoTServer {
 
             return true;
         }
+
+        private void updateDeviceData(List<String> fileContent, int deviceIndex, DeviceData data) {
+            String temperaturaStr = (data.temperatura != null) ? "Última Temperatura: " + data.temperatura + "°C" : "Última Temperatura: ";
+            fileContent.set(deviceIndex + 1, temperaturaStr);
+            fileContent.set(deviceIndex + 2, "Última Imagem: " + data.imagem);
+        }
+
+        private void addNewDeviceData(List<String> fileContent, String dispositivoKey, DeviceData data) {
+            String temperaturaStr = (data.temperatura != null) ? "Última Temperatura: " + data.temperatura + "°C" : "Última Temperatura: ";
+            fileContent.add(dispositivoKey);
+            fileContent.add(temperaturaStr);
+            fileContent.add("Última Imagem: " + data.imagem);
+        }
+
 
 
         public synchronized boolean isDeviceRegistered(String username, String devId) {
@@ -612,5 +699,14 @@ public class IoTServer {
             return false;
         }
 
+    }
+    public class DeviceData {
+        public Float temperatura;
+        public String imagem;
+
+        public DeviceData(Float temperatura, String imagem) {
+            this.temperatura = temperatura;
+            this.imagem = imagem;
+        }
     }
 }
