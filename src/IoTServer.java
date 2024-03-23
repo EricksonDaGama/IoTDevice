@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-
 public class IoTServer {
     private ExecutorService executorService;
     private AuthenticationService authenticationService;
@@ -117,7 +116,7 @@ public class IoTServer {
                 while (!clientSocket.isClosed()) {
                     try {
                         String comando = inStream.readUTF();
-                        String resposta = processarComando(comando,inStream);
+                        String resposta = processarComando(comando,inStream,outStream);
 
                         System.out.println("agora vou enviar a resposta ao cliente sobre a imagem a resposta sera"+ resposta);
                         outStream.writeUTF(resposta);
@@ -146,7 +145,7 @@ public class IoTServer {
                 }
             }
         }
-        private String processarComando(String comando,ObjectInputStream inStream) {
+        private String processarComando(String comando,ObjectInputStream inStream,ObjectOutputStream outStream) throws IOException {
             // Analise o comando e execute a ação correspondente
             // Por exemplo, se o comando for "CREATE <dm>", crie um novo domínio
             // Retorne uma resposta baseada no resultado da ação
@@ -160,7 +159,6 @@ public class IoTServer {
                 }
                 return criarDominio(parts[1]);
             }
-
 
             if (parts[0].equalsIgnoreCase("ADD")) {
                 if (parts.length != 3) {
@@ -186,7 +184,10 @@ public class IoTServer {
             }
 
             if (parts[0].equalsIgnoreCase("RT")) {
-                return "Funcionalidade ADD Não Implementada";
+                if (parts.length != 2) {
+                    return "Formato de Comando Inválido";
+                }
+                return handleTemperatureReadRequest(parts[1], outStream);
             }
             if (parts[0].equalsIgnoreCase("RI")) {
                 return "Funcionalidade ADD Não Implementada";
@@ -195,6 +196,89 @@ public class IoTServer {
 
             return "Comando Desconhecido";
 
+        }
+
+        private String handleTemperatureReadRequest(String domain, ObjectOutputStream outStream) throws IOException {
+            if (!dominioExiste(domain)) {
+                return "NODM # esse domínio não existe";
+            }
+
+            if (!isUserAllowed(domain, username)) {
+                return "NOPERM # sem permissões de leitura";
+            }
+
+            List<String> temperatureData = collectTemperatureData(domain);
+            if (temperatureData.isEmpty()) {
+                return "NODATA";
+            }
+
+            Path tempFile = createTempFileWithData(temperatureData);
+            sendFileToClient(tempFile, outStream);
+            Files.deleteIfExists(tempFile); // Limpar o arquivo temporário
+            return "OK"; // A mensagem OK é implícita pelo envio do arquivo
+        }
+
+        private List<String> collectTemperatureData(String domain) throws IOException {
+            // Implementação para coletar dados de temperatura dos dispositivos do domínio
+            // ...
+            List<String> data = new ArrayList<>();
+            Set<String> devicesInDomain = getDevicesInDomain(domain);
+            try (BufferedReader br = new BufferedReader(new FileReader("src/devices.txt"))) {
+                String line;
+                String currentDevice = null;
+                while ((line = br.readLine()) != null) {
+                    if (line.trim().startsWith("Dispositivo:")) {
+                        currentDevice = line.substring(line.indexOf(':') + 1).trim();
+                        System.out.println("dispositivo pegado no device.txt "+currentDevice);
+                    } else if (line.trim().startsWith("Última Temperatura:") && currentDevice != null) {
+                        System.out.println("o dispositivo está no dominio "+devicesInDomain.contains(currentDevice));
+                        if (devicesInDomain.contains(currentDevice)) {
+                            data.add(currentDevice + " - " + line.trim());
+                        }
+                    }
+                }
+            }
+            return data;
+        }
+
+        private Set<String> getDevicesInDomain(String domain) throws IOException {
+            Set<String> devices = new HashSet<>();
+            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+                String line;
+                boolean isCurrentDomain = false;
+                while ((line = br.readLine()) != null) {
+                    if (line.trim().startsWith("Domínio: " + domain)) {
+                        isCurrentDomain = true;
+                    } else if (isCurrentDomain && line.trim().startsWith("Dispositivos registrados:")) {
+                        String deviceLine = line.substring(line.indexOf(':') + 1).trim();
+                        // Divide por vírgula seguida de espaço ou apenas espaço
+                        String[] deviceList = deviceLine.split(",\\s*|\\s+");
+                        for (String device : deviceList) {
+                            if (!device.isEmpty()) {
+                                devices.add(device.trim());
+                            }
+                        }
+                        break;
+                    } else if (line.trim().isEmpty()) {
+                        isCurrentDomain = false;
+                    }
+                }
+            }
+            return devices;
+        }
+
+        private Path createTempFileWithData(List<String> data) throws IOException {
+            Path tempFile = Files.createTempFile("temperature_data", ".txt");
+            Files.write(tempFile, data, StandardOpenOption.WRITE);
+            return tempFile;
+        }
+
+        private void sendFileToClient(Path file, ObjectOutputStream outStream) throws IOException {
+            byte[] fileContent = Files.readAllBytes(file);
+            outStream.writeUTF("OK");
+            outStream.writeLong(fileContent.length);
+            outStream.write(fileContent);
+            outStream.flush();
         }
 
         private String handleImageUpload(String[] partes, ObjectInputStream inStream) {
@@ -228,6 +312,7 @@ public class IoTServer {
                 }
 
                 if (deviceManager.isDeviceRegistered(username, devId)) {
+                    System.out.println("ola 231");
                     return deviceManager.updateDeviceImage(username, devId, filename) ? "OK" : "NOK";
                 }
             } catch (IOException e) {
@@ -579,7 +664,6 @@ public class IoTServer {
             DeviceData data = devices.getOrDefault(dispositivoKey, new DeviceData(null, ""));
             data.imagem = filename;
             devices.put(dispositivoKey, data);
-
             return saveDevices(devices);
         }
 
@@ -602,7 +686,10 @@ public class IoTServer {
                     } else if (line.trim().startsWith("Última Temperatura:")) {
                         if (currentData != null) {
                             String tempStr = line.substring(line.indexOf(':') + 1).trim();
-                            currentData.temperatura = tempStr.isEmpty() ? null : Float.parseFloat(tempStr);
+                            if (!tempStr.isEmpty() && !tempStr.equals("°C")) { // Adicionada verificação extra
+                                tempStr = tempStr.replace("°C", "").trim(); // Remove "°C" se existir
+                                currentData.temperatura = Float.parseFloat(tempStr);
+                            }
                         }
                     } else if (line.trim().startsWith("Última Imagem:")) {
                         if (currentData != null) {

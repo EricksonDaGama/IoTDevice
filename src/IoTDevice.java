@@ -1,9 +1,12 @@
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class IoTDevice {
-    private static final String USER_ID = "Erickson";  //"Rodrigo"; // "Barata" //"Erickson"
+    private static final String USER_ID = "Rodrigo";  //"Rodrigo"; // "Barata" //"Erickson"
     private static final String HOST = "localhost";
     private static final int PORT = 23456;
 
@@ -156,7 +159,28 @@ public class IoTDevice {
             // Recebendo a resposta do servidor
             String resposta = inStream.readUTF();
             System.out.println("Resposta do Servidor: " + resposta);
-        } else {
+        }
+        else if (comando.toUpperCase().startsWith("RT ")) {
+            outStream.writeUTF(comando);
+            outStream.flush();
+
+            // Receber e processar resposta do servidor
+            String response = inStream.readUTF();
+            if ("OK".equals(response)) {
+                long fileSize = inStream.readLong();
+                byte[] fileData = new byte[(int) fileSize];
+                inStream.readFully(fileData);
+                // Salvar ou exibir os dados recebidos
+                Path path = Paths.get("received_temperature_data.txt");
+                Files.write(path, fileData);
+                System.out.println("OK, "+ fileSize + " (long) seguido de "+ fileSize+ " bytes de dados.");
+                System.out.println("Arquivo de temperatura recebido e salvo como " + path.getFileName());
+            }
+            else  {
+                System.out.println("Resposta do Servidor: " + response);
+            }
+        }
+        else {
             // Processamento dos outros comandos
             outStream.writeUTF(comando);
             outStream.flush();
@@ -167,29 +191,14 @@ public class IoTDevice {
         }
     }
 
-//    String path = "src/"+filename; //filename=Erickson1_03-22-24";
-//
-//
-//    File file = new File(path);
-//        if (!file.exists()) {
-//        System.out.println("Arquivo não encontrado: " + filename);
-//        return;
-//    }
-
     private void enviarImagem(String filename, ObjectOutputStream outStream) throws IOException {
-
         String path = "src/"+filename; //filename=Erickson1_03-22-24";
-
-
         File file = new File(path);
             if (!file.exists()) {
             System.out.println("Arquivo não encontrado: " + filename);
             return;
         }
-
-
         long fileSize = file.length();
-
         // Enviando comando e nome do arquivo
         outStream.writeUTF("EI " + filename);
 
@@ -206,8 +215,5 @@ public class IoTDevice {
         }
         outStream.flush();
     }
-
-
-
 
 }

@@ -1,0 +1,2 @@
+Erickson:1 - Última Temperatura: 10.0°C
+Rodrigo:1 - Última Temperatura: 25.0°C
