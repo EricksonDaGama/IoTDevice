@@ -3,7 +3,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class IoTDevice {
-    private static final String USER_ID = "Erickson";  //"Rodrigo"; // "Barata" //"Erickson"
+    private static final String USER_ID = "Rodrigo";  //"Rodrigo"; // "Barata" //"Erickson"
     private static final String HOST = "localhost";
     private static final int PORT = 23456;
 

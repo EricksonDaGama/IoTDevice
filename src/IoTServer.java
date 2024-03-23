@@ -228,6 +228,7 @@ public class IoTServer {
                 }
 
                 if (deviceManager.isDeviceRegistered(username, devId)) {
+                    System.out.println("ola 231");
                     return deviceManager.updateDeviceImage(username, devId, filename) ? "OK" : "NOK";
                 }
             } catch (IOException e) {
@@ -579,10 +580,8 @@ public class IoTServer {
             DeviceData data = devices.getOrDefault(dispositivoKey, new DeviceData(null, ""));
             data.imagem = filename;
             devices.put(dispositivoKey, data);
-
             return saveDevices(devices);
         }
-
 
 
         private Map<String, DeviceData> loadDevices() {
@@ -602,7 +601,10 @@ public class IoTServer {
                     } else if (line.trim().startsWith("Última Temperatura:")) {
                         if (currentData != null) {
                             String tempStr = line.substring(line.indexOf(':') + 1).trim();
-                            currentData.temperatura = tempStr.isEmpty() ? null : Float.parseFloat(tempStr);
+                            if (!tempStr.isEmpty() && !tempStr.equals("°C")) { // Adicionada verificação extra
+                                tempStr = tempStr.replace("°C", "").trim(); // Remove "°C" se existir
+                                currentData.temperatura = Float.parseFloat(tempStr);
+                            }
                         }
                     } else if (line.trim().startsWith("Última Imagem:")) {
                         if (currentData != null) {
@@ -620,8 +622,10 @@ public class IoTServer {
         }
 
 
+
         private boolean saveDevices(Map<String, DeviceData> devices) {
             List<String> fileContent = new ArrayList<>();
+            System.out.println("oi chegeii");
 
             try (BufferedReader br = new BufferedReader(new FileReader("src/devices.txt"))) {
                 String line;
@@ -632,6 +636,8 @@ public class IoTServer {
                 e.printStackTrace();
                 return false;
             }
+
+            //System.out.println("oi chegeii");
 
             for (Map.Entry<String, DeviceData> entry : devices.entrySet()) {
                 String dispositivoKey = "Dispositivo: " + entry.getKey();
