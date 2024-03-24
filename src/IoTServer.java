@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-
 public class IoTServer {
     private ExecutorService executorService;
     private AuthenticationService authenticationService;
@@ -21,11 +20,9 @@ public class IoTServer {
         deviceManager = new DeviceManager();
         startSessionCleanupThread();
     }
-
     public static void main(String[] args) {
         new IoTServer().startServer();
     }
-
     public void startServer() {
         try (ServerSocket serverSocket = new ServerSocket(23456)) {
             System.out.println("Servidor iniciado.");
@@ -150,9 +147,7 @@ public class IoTServer {
             // Por exemplo, se o comando for "CREATE <dm>", crie um novo domínio
             // Retorne uma resposta baseada no resultado da ação
             // Exemplo: return "Domínio criado com sucesso";
-
             String[] parts = comando.split(" ");
-
             if (parts[0].equalsIgnoreCase("CREATE")) {
                 if (parts.length != 2) {
                     return "Formato de Comando Inválido";
@@ -190,14 +185,44 @@ public class IoTServer {
                 return handleTemperatureReadRequest(parts[1], outStream);
             }
             if (parts[0].equalsIgnoreCase("RI")) {
-                return "Funcionalidade ADD Não Implementada";
+                return handleImageRequest(parts,outStream);
+            }
+            return "Comando Desconhecido";
+        }
+        private String handleImageRequest(String[] parts, ObjectOutputStream outStream) throws IOException {
+            if (parts.length != 2) {
+                return "Formato de Comando Inválido";
+            }
+            String dispositivo = parts[1];
+            String[] userName_idDevice=  dispositivo.split(":");
+            if(!deviceManager.isDeviceRegistered(userName_idDevice[0],userName_idDevice[1])) {
+                return "NOID # esse device id não existe";
+
+            }
+            Set<String> dominios=deviceManager.dominiosOfDevice(dispositivo);
+            System.out.println("216");
+            boolean userPermissao=false;
+            for(String d : dominios){
+                if (isUserAllowed(d,username)) {
+                    userPermissao = true;
+                }
+            }
+            if(!userPermissao) {
+                return "NOPERM # sem permissões de leitura";
+            }
+            Map<String,DeviceData> devices=deviceManager.loadDevices();
+            if(!devices.containsKey(dispositivo)) {
+                return "NODATA # esse device id não publicou dados";
             }
 
+            if(devices.get(dispositivo).imagem.length()==0) {
+                return "NODATA # esse device id não publicou dados";
 
-            return "Comando Desconhecido";
+            }
+            String fileName=devices.get(dispositivo).imagem;
+            return sendImageToclient(fileName,outStream);
 
         }
-
         private String handleTemperatureReadRequest(String domain, ObjectOutputStream outStream) throws IOException {
             if (!dominioExiste(domain)) {
                 return "NODM # esse domínio não existe";
@@ -266,7 +291,6 @@ public class IoTServer {
             }
             return devices;
         }
-
         private Path createTempFileWithData(List<String> data) throws IOException {
             Path tempFile = Files.createTempFile("temperature_data", ".txt");
             Files.write(tempFile, data, StandardOpenOption.WRITE);
@@ -279,6 +303,29 @@ public class IoTServer {
             outStream.writeLong(fileContent.length);
             outStream.write(fileContent);
             outStream.flush();
+        }
+        private String  sendImageToclient(String filename,ObjectOutputStream outStream ) throws IOException {
+            outStream.writeUTF("OK");
+            String path = "src/dadosSensoriasClientes/"+filename; //filename=Erickson1_03-22-24";
+            File file = new File(path);
+            if (!file.exists()) {
+                System.out.println("Arquivo não encontrado: " + filename);
+                return "NODATA # esse device id não publicou dados";
+            }
+            long fileSize = file.length();
+            // Enviando o tamanho do arquivo
+            outStream.writeLong(fileSize);
+
+            // Enviando o arquivo
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, bytesRead);
+                }
+            }
+            outStream.flush();
+            return "OK"; // A mensagem OK é implícita pelo envio do arquivo
         }
 
         private String handleImageUpload(String[] partes, ObjectInputStream inStream) {
@@ -312,7 +359,6 @@ public class IoTServer {
                 }
 
                 if (deviceManager.isDeviceRegistered(username, devId)) {
-                    System.out.println("ola 231");
                     return deviceManager.updateDeviceImage(username, devId, filename) ? "OK" : "NOK";
                 }
             } catch (IOException e) {
@@ -320,11 +366,6 @@ public class IoTServer {
             }
             return "NOK"; // Falha no upload ou outro erro
         }
-
-
-
-        //Files.write(Paths.get("src/dadosSensoriasClientes/" + filename), imageBytes);
-
         private String handleTemperatureUpdate(String[] partes) {
             if (partes.length != 2) {
                 return "NOK"; // Formato de comando inválido
@@ -339,8 +380,6 @@ public class IoTServer {
             }
             return "NOK"; // Dispositivo não registrado ou outro erro
         }
-
-
 
         private String criarDominio(String nomeDominio) {
             // Implementar lógica para criar um domínio
@@ -375,10 +414,6 @@ public class IoTServer {
             }
             return false;
         }
-
-
-
-
         private String adicionarUsuarioAoDominio(String user1, String dm) {
             synchronized (this) { // Sincronizar o acesso ao arquivo
                 try {
@@ -423,7 +458,6 @@ public class IoTServer {
             }
             return false;
         }
-
 
         //Método para Adicionar Usuário ao Arquivo de Domínios:
         private void adicionarUsuarioAoArquivo(String user1, String dm) throws IOException {
@@ -579,8 +613,6 @@ public class IoTServer {
                 return "OK-NEW-USER";
             }
         }
-
-
         private void loadUserCredentials() {
             try (BufferedReader reader = new BufferedReader(new FileReader(USERS_FILE))) {
                 String line;
@@ -656,7 +688,6 @@ public class IoTServer {
             return saveDevices(devices);
         }
 
-
         public synchronized boolean updateDeviceImage(String username, String devId, String filename) {
             Map<String, DeviceData> devices = loadDevices();
             String dispositivoKey = username + ":" + devId;
@@ -666,8 +697,6 @@ public class IoTServer {
             devices.put(dispositivoKey, data);
             return saveDevices(devices);
         }
-
-
 
         private Map<String, DeviceData> loadDevices() {
             Map<String, DeviceData> devices = new HashMap<>();
@@ -705,7 +734,6 @@ public class IoTServer {
             }
             return devices;
         }
-
 
         private boolean saveDevices(Map<String, DeviceData> devices) {
             List<String> fileContent = new ArrayList<>();
@@ -766,9 +794,6 @@ public class IoTServer {
             fileContent.add(temperaturaStr);
             fileContent.add("Última Imagem: " + data.imagem);
         }
-
-
-
         public synchronized boolean isDeviceRegistered(String username, String devId) {
             String dispositivoKey = username + ":" + devId;
             try (BufferedReader reader = new BufferedReader(new FileReader("src/dominios.txt"))) {
@@ -785,7 +810,26 @@ public class IoTServer {
             }
             return false;
         }
-
+        public synchronized Set<String> dominiosOfDevice(String dispositive) {
+            Set<String> dominios=new HashSet<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader("src/dominios.txt"))) {
+                String line;
+                String dominio="";
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().startsWith("Domínio:")) {
+                        dominio=line.split(" ")[1];
+                    }
+                    if (line.trim().startsWith("Dispositivos registrados:")) {
+                        if (line.contains(dispositive)) {
+                            dominios.add(dominio);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return dominios;
+        }
     }
     public class DeviceData {
         public Float temperatura;

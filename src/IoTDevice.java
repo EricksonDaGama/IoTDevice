@@ -3,17 +3,16 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Scanner;
 
 public class IoTDevice {
     private static final String USER_ID = "Rodrigo";  //"Rodrigo"; // "Barata" //"Erickson"
     private static final String HOST = "localhost";
     private static final int PORT = 23456;
-
     public static void main(String[] args) {
         new IoTDevice().iniciarCliente();
     }
-
     public void iniciarCliente() {
         try (Socket socket = new Socket(HOST, PORT);
              ObjectOutputStream outStream = new ObjectOutputStream(socket.getOutputStream());
@@ -33,8 +32,6 @@ public class IoTDevice {
                 mostrarMenu();
                 System.out.print("Insira um comando: ");
                 String comando = new Scanner(System.in).nextLine();
-
-
                 if ("EXIT".equals(comando.toUpperCase())) {
                     break;
                 }
@@ -43,8 +40,6 @@ public class IoTDevice {
                 String resposta = inStream.readUTF();
                 System.out.println("Resposta do Servidor: " + resposta);
             }
-
-
         } catch (IOException e) {
             System.err.println("Erro ao conectar ao servidor.");
             e.printStackTrace();
@@ -66,7 +61,6 @@ public class IoTDevice {
                 System.out.println("Autenticação inválida. O timestamp do servidor não é recente.");
                 return false;
             }
-
             switch (response) {
                 case "WRONG-PWD":
                     System.out.println("Senha incorreta. Tente novamente.");
@@ -83,16 +77,13 @@ public class IoTDevice {
             }
         }
     }
-
     private void enviarDeviceId(Scanner scanner, ObjectOutputStream outStream, ObjectInputStream inStream) throws IOException {
         String deviceResponse;
         do {
             System.out.println("Digite o ID do dispositivo:");
             String devId = scanner.nextLine();
-
             outStream.writeObject(devId);
             outStream.flush();
-
             deviceResponse = inStream.readUTF();
             if ("OK-DEVID".equals(deviceResponse)) {
                 System.out.println(deviceResponse);
@@ -106,24 +97,17 @@ public class IoTDevice {
                 break;
             }
         } while ("NOK-DEVID".equals(deviceResponse));
-
-//        System.out.println("digite qualquer coisa para fechar");
-//        scanner.nextLine();
     }
-
     private void enviarCredenciais(ObjectOutputStream outStream, String userid, String senha) throws IOException {
         outStream.writeObject(userid);
         outStream.writeObject(senha);
         outStream.flush();
     }
-
     private void enviarDadosExecutavel(ObjectOutputStream outStream, ObjectInputStream inStream) throws IOException {
         String path = "out/production/SegC-grupo02- proj1-fase1/IoTDevice.class";
         File classFile = new File(path);
         String name = path.substring(path.lastIndexOf("/") + 1); //pegar apenas o nome do arquivo
-
         long fileSize = classFile.length();
-
         outStream.writeUTF(name);
         outStream.writeLong(fileSize);
         outStream.flush();
@@ -173,12 +157,50 @@ public class IoTDevice {
                 // Salvar ou exibir os dados recebidos
                 Path path = Paths.get("received_temperature_data.txt");
                 Files.write(path, fileData);
-                System.out.println("OK, "+ fileSize + " (long) seguido de "+ fileSize+ " bytes de dados.");
+                System.out.println("OK, " + fileSize + " (long) seguido de " + fileSize + " bytes de dados.");
                 System.out.println("Arquivo de temperatura recebido e salvo como " + path.getFileName());
-            }
-            else  {
+            } else {
                 System.out.println("Resposta do Servidor: " + response);
             }
+        }else if(comando.toUpperCase().startsWith("RI ")){
+            //enviar o comando
+            outStream.writeUTF(comando);
+            outStream.flush();
+            // Receber e processar resposta do servidor
+            String response = inStream.readUTF();
+            if ("OK".equals(response)) {
+                try {
+                    String filename = comando.substring(3)+"received_image_data.jpeg";
+                    //receber o tamanho do ficheiro enviado pelo servidor
+                    long fileSize = inStream.readLong();
+                    byte[] imageBytes = new byte[(int) fileSize];
+                    int readBytes = 0;
+                    while (readBytes < fileSize) {
+                        int result = inStream.read(imageBytes, readBytes, imageBytes.length - readBytes);
+                        if (result == -1) {
+                            break; // EOF
+                        }
+                        readBytes += result;
+                    }
+                    Path directoryPath = Paths.get("src/imagensrecebidadoServidor");
+                    Path filePath = directoryPath.resolve(filename);
+
+                    if (!Files.exists(directoryPath)) {
+                        Files.createDirectories(directoryPath);
+                    }
+                    // Usando try-with-resources para garantir que o stream seja fechado
+                    try (OutputStream os = Files.newOutputStream(filePath, StandardOpenOption.CREATE)) {
+                        os.write(imageBytes);
+                        System.out.println("OK, " + fileSize + " (long) seguido de " + fileSize + " bytes de dados.");
+                        System.out.println("Imagem recebida e salva");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+            System.out.println("Resposta do Servidor: " + response);
+        }
+
         }
         else {
             // Processamento dos outros comandos
@@ -190,7 +212,6 @@ public class IoTDevice {
             System.out.println("Resposta do Servidor: " + resposta);
         }
     }
-
     private void enviarImagem(String filename, ObjectOutputStream outStream) throws IOException {
         String path = "src/"+filename; //filename=Erickson1_03-22-24";
         File file = new File(path);
@@ -201,10 +222,8 @@ public class IoTDevice {
         long fileSize = file.length();
         // Enviando comando e nome do arquivo
         outStream.writeUTF("EI " + filename);
-
         // Enviando o tamanho do arquivo
         outStream.writeLong(fileSize);
-
         // Enviando o arquivo
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             byte[] buffer = new byte[1024];
@@ -215,5 +234,4 @@ public class IoTDevice {
         }
         outStream.flush();
     }
-
 }
