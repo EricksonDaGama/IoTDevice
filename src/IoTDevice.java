@@ -3,11 +3,10 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Scanner;
 
 public class IoTDevice {
-    private static final String USER_ID = "Rodrigo";  //"Rodrigo"; // "Barata" //"Erickson"
+    private static final String USER_ID = "Erickson";  //"Rodrigo"; // "Barata" //"Erickson"
     private static final String HOST = "localhost";
     private static final int PORT = 23456;
     public static void main(String[] args) {
@@ -143,8 +142,7 @@ public class IoTDevice {
             // Recebendo a resposta do servidor
             String resposta = inStream.readUTF();
             System.out.println("Resposta do Servidor: " + resposta);
-        }
-        else if (comando.toUpperCase().startsWith("RT ")) {
+        } else if (comando.toUpperCase().startsWith("RT ")) {
             outStream.writeUTF(comando);
             outStream.flush();
 
@@ -162,56 +160,31 @@ public class IoTDevice {
             } else {
                 System.out.println("Resposta do Servidor: " + response);
             }
-        }else if(comando.toUpperCase().startsWith("RI ")){
-            //enviar o comando
+        } else if (comando.toUpperCase().startsWith("RI ")) {
             outStream.writeUTF(comando);
             outStream.flush();
-            // Receber e processar resposta do servidor
+
             String response = inStream.readUTF();
             if ("OK".equals(response)) {
-                try {
-                    String filename = comando.substring(3)+"received_image_data.jpeg";
-                    //receber o tamanho do ficheiro enviado pelo servidor
-                    long fileSize = inStream.readLong();
-                    byte[] imageBytes = new byte[(int) fileSize];
-                    int readBytes = 0;
-                    while (readBytes < fileSize) {
-                        int result = inStream.read(imageBytes, readBytes, imageBytes.length - readBytes);
-                        if (result == -1) {
-                            break; // EOF
-                        }
-                        readBytes += result;
-                    }
-                    Path directoryPath = Paths.get("src/imagensrecebidadoServidor");
-                    Path filePath = directoryPath.resolve(filename);
+                long fileSize = inStream.readLong();
+                byte[] fileData = new byte[(int) fileSize];
+                inStream.readFully(fileData);
 
-                    if (!Files.exists(directoryPath)) {
-                        Files.createDirectories(directoryPath);
-                    }
-                    // Usando try-with-resources para garantir que o stream seja fechado
-                    try (OutputStream os = Files.newOutputStream(filePath, StandardOpenOption.CREATE)) {
-                        os.write(imageBytes);
-                        System.out.println("OK, " + fileSize + " (long) seguido de " + fileSize + " bytes de dados.");
-                        System.out.println("Imagem recebida e salva");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                String filename = comando.split(" ")[1] + ".jpg"; // Nome do arquivo baseado no comando
+                Path directoryPath = Paths.get("imagensrecebidasdoServidor");
+                if (!Files.exists(directoryPath)) {
+                    Files.createDirectories(directoryPath);
                 }
+                Path filePath = directoryPath.resolve(filename);
+                Files.write(filePath, fileData);
+                System.out.println("OK, " + fileSize + " (long) seguido de " + fileSize + " bytes de dados.");
+                System.out.println("Imagem recebida e salva em: " + filePath);
             } else {
-            System.out.println("Resposta do Servidor: " + response);
-        }
-
-        }
-        else {
-            // Processamento dos outros comandos
-            outStream.writeUTF(comando);
-            outStream.flush();
-
-            // Recebendo a resposta do servidor
-            String resposta = inStream.readUTF();
-            System.out.println("Resposta do Servidor: " + resposta);
+                System.out.println("Resposta do Servidor: " + response);
+            }
         }
     }
+
     private void enviarImagem(String filename, ObjectOutputStream outStream) throws IOException {
         String path = "src/"+filename; //filename=Erickson1_03-22-24";
         File file = new File(path);

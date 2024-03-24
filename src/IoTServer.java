@@ -185,43 +185,31 @@ public class IoTServer {
                 return handleTemperatureReadRequest(parts[1], outStream);
             }
             if (parts[0].equalsIgnoreCase("RI")) {
-                return handleImageRequest(parts,outStream);
+                if (parts.length != 2) {
+                    return "Formato de Comando Inválido";
+                }
+                return handleImageRequest(parts[1], outStream);
             }
             return "Comando Desconhecido";
         }
-        private String handleImageRequest(String[] parts, ObjectOutputStream outStream) throws IOException {
-            if (parts.length != 2) {
-                return "Formato de Comando Inválido";
-            }
-            String dispositivo = parts[1];
-            String[] userName_idDevice=  dispositivo.split(":");
-            if(!deviceManager.isDeviceRegistered(userName_idDevice[0],userName_idDevice[1])) {
+        private String handleImageRequest(String deviceId, ObjectOutputStream outStream) throws IOException {
+            String[] userName_idDevice=  deviceId.split(":");
+            if (!deviceManager.isDeviceRegistered(userName_idDevice[0], userName_idDevice[1])) {
                 return "NOID # esse device id não existe";
-
             }
-            Set<String> dominios=deviceManager.dominiosOfDevice(dispositivo);
-            System.out.println("216");
-            boolean userPermissao=false;
-            for(String d : dominios){
-                if (isUserAllowed(d,username)) {
-                    userPermissao = true;
-                }
-            }
-            if(!userPermissao) {
+            if (!isUserAllowedToReadDevice(deviceId)) {
                 return "NOPERM # sem permissões de leitura";
             }
-            Map<String,DeviceData> devices=deviceManager.loadDevices();
-            if(!devices.containsKey(dispositivo)) {
+            String imagePath = deviceManager.getDeviceImagePath(deviceId); //getDeviceImagePath
+            if (imagePath == null || imagePath.isEmpty()) {
                 return "NODATA # esse device id não publicou dados";
             }
-
-            if(devices.get(dispositivo).imagem.length()==0) {
-                return "NODATA # esse device id não publicou dados";
-
+            Path imageFile = Paths.get("src/dadosSensoriasClientes/", imagePath);
+            if (!Files.exists(imageFile)) {
+                return "NODATA # imagem não encontrada";
             }
-            String fileName=devices.get(dispositivo).imagem;
-            return sendImageToclient(fileName,outStream);
-
+            sendFileToClient(imageFile, outStream);
+            return "OK"; // A mensagem OK é implícita pelo envio do arquivo
         }
         private String handleTemperatureReadRequest(String domain, ObjectOutputStream outStream) throws IOException {
             if (!dominioExiste(domain)) {
@@ -236,11 +224,31 @@ public class IoTServer {
             if (temperatureData.isEmpty()) {
                 return "NODATA";
             }
-
             Path tempFile = createTempFileWithData(temperatureData);
             sendFileToClient(tempFile, outStream);
             Files.deleteIfExists(tempFile); // Limpar o arquivo temporário
             return "OK"; // A mensagem OK é implícita pelo envio do arquivo
+        }
+
+        private boolean isUserAllowedToReadDevice(String deviceId) throws IOException {
+            boolean result=false;
+            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+                String line;
+                String currentDomain = null;
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("Domínio:")) {
+                        currentDomain = line.substring(line.indexOf(':') + 1).trim();
+                    }
+                    if (line.startsWith("Dispositivos registrados:") && currentDomain != null) {
+                        if (line.contains(deviceId)) {
+                            // Dispositivo encontrado no domínio, verificar permissão do usuário
+                            if(isUserAllowed(currentDomain, username) !=false)
+                                result=true;
+                        }
+                    }
+                }
+            }
+            return result; // Dispositivo não encontrado ou usuário sem permissão
         }
 
         private List<String> collectTemperatureData(String domain) throws IOException {
@@ -494,8 +502,6 @@ public class IoTServer {
                 }
             }
         }
-
-
         private String registrarDispositivoNoDominio(String dm) {
             synchronized (this) {
                 try {
@@ -539,8 +545,6 @@ public class IoTServer {
             }
             return false; // Retorna falso se o domínio não foi encontrado ou o usuário não tem permissão
         }
-
-
         private void registrarDispositivoNoArquivo(String dm) throws IOException {
             // A lógica abaixo é simplificada e pode precisar ser adaptada para o seu caso específico
             List<String> lines = new ArrayList<>();
@@ -829,6 +833,24 @@ public class IoTServer {
                 e.printStackTrace();
             }
             return dominios;
+        }
+        public String getDeviceImagePath(String deviceId) {
+            try (BufferedReader reader = new BufferedReader(new FileReader("src/devices.txt"))) {
+                String line;
+                boolean isCurrentDevice = false;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("Dispositivo: " + deviceId)) {
+                        isCurrentDevice = true;
+                    } else if (isCurrentDevice && line.startsWith("Última Imagem:")) {
+                        return line.substring(line.indexOf(':') + 1).trim(); // Retorna o caminho da imagem
+                    } else if (line.isEmpty()) {
+                        isCurrentDevice = false;
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println("Erro ao acessar o arquivo de dispositivos: " + e.getMessage());
+            }
+            return null; // Nenhum caminho de imagem encontrado
         }
     }
     public class DeviceData {
