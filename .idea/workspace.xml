@@ -57,7 +57,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "receber-img2",
+    "git-widget-placeholder": "finalizar/testar",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src",
     "node.js.detected.package.eslint": "true",
@@ -82,9 +82,16 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager" selected="JAR Application.IoTDevice.jar (1)">
+  <component name="RunManager" selected="Application.IoTDevice">
     <configuration name="IoTDevice" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="IoTDevice" />
+      <module name="SegC-grupo02- proj1-fase1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IoTServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="IoTServer" />
       <module name="SegC-grupo02- proj1-fase1" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -102,24 +109,20 @@
       <option name="JAR_PATH" value="$PROJECT_DIR$/IoTServer.jar" />
       <method v="2" />
     </configuration>
-    <configuration name="IoTServer.jar" type="JarApplication" temporary="true">
-      <option name="JAR_PATH" value="$PROJECT_DIR$/src/IoTServer.jar" />
-      <method v="2" />
-    </configuration>
     <list>
+      <item itemvalue="Application.IoTServer" />
       <item itemvalue="Application.IoTDevice" />
       <item itemvalue="JAR Application.IoTDevice.jar" />
       <item itemvalue="JAR Application.IoTDevice.jar (1)" />
-      <item itemvalue="JAR Application.IoTServer.jar" />
       <item itemvalue="JAR Application.IoTServer.jar (1)" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.IoTDevice" />
+        <item itemvalue="Application.IoTServer" />
         <item itemvalue="JAR Application.IoTDevice.jar (1)" />
         <item itemvalue="JAR Application.IoTServer.jar (1)" />
         <item itemvalue="JAR Application.IoTDevice.jar" />
-        <item itemvalue="JAR Application.IoTServer.jar" />
-        <item itemvalue="Application.IoTDevice" />
       </list>
     </recent_temporary>
   </component>
@@ -150,7 +153,7 @@
       <workItem from="1711213451462" duration="27171000" />
       <workItem from="1711314383507" duration="5486000" />
       <workItem from="1711356317572" duration="1031000" />
-      <workItem from="1711412578804" duration="11578000" />
+      <workItem from="1711412578804" duration="15196000" />
     </task>
     <servers />
   </component>

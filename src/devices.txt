@@ -1,6 +1,9 @@
 Dispositivo: Erickson:1
 Última Temperatura: 6.0°C
-Última Imagem:
+Última Imagem: 
 Dispositivo: Rodrigo:1
 Última Temperatura: 25.0°C
 Última Imagem: Rodrigo1_23-03-24.jpeg
+Dispositivo: Erickson:9
+Última Temperatura: 16.0°C
+Última Imagem: Erickson9_3-22-24.jpeg

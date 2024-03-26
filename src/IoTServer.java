@@ -323,9 +323,13 @@ public class IoTServer {
                 try (OutputStream os = Files.newOutputStream(filePath, StandardOpenOption.CREATE)) {
                     os.write(imageBytes);
                 }
-                if (deviceManager.isDeviceRegistered(username, devId)) {
-                    return deviceManager.updateDeviceImage(username, devId, filename) ? "OK" : "NOK";
-                }
+//                if (deviceManager.isDeviceRegistered(username, devId)) {
+               // Se o device está ou não num domínio, é irrelevante para os dados ficarem guardados no servidor.
+//                    return deviceManager.updateDeviceImage(username, devId, filename) ? "OK" : "NOK";
+//                }
+                return deviceManager.updateDeviceImage(username, devId, filename) ? "OK" : "NOK";
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -337,13 +341,17 @@ public class IoTServer {
             }
             try {
                 float temperatura = Float.parseFloat(partes[1]);
-                if (deviceManager.isDeviceRegistered(username, devId)) {
-                    return deviceManager.updateDeviceTemperature(username, devId, temperatura) ? "OK" : "NOK";
-                }
+//                if (deviceManager.isDeviceRegistered(username, devId)) {
+// Se o device está ou não num domínio, é irrelevante para os dados ficarem guardados no servidor.
+//                    return deviceManager.updateDeviceTemperature(username, devId, temperatura) ? "OK" : "NOK";
+//                }
+//                System.out.println("temperatura do dispositivo "+ username+":"+devId+" registada");
+                return deviceManager.updateDeviceTemperature(username, devId, temperatura) ? "OK" : "NOK";
+
             } catch (NumberFormatException e) {
                 return "NOK"; // Formato de temperatura inválido
             }
-            return "NOK"; // Dispositivo não registrado ou outro erro
+            //return "NOK"; // Dispositivo não registrado ou outro erro
         }
         private String criarDominio(String nomeDominio) {
             // Implementar lógica para criar um domínio
