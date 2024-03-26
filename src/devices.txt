@@ -7,3 +7,4 @@ Dispositivo: Rodrigo:1
 Dispositivo: Erickson:9
 Última Temperatura: 16.0°C
 Última Imagem: Erickson9_3-22-24.jpeg
+

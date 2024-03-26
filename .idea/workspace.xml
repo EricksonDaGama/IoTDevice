@@ -82,7 +82,7 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.IoTDevice">
+  <component name="RunManager" selected="JAR Application.IoTDevice.jar (1)">
     <configuration name="IoTDevice" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="IoTDevice" />
       <module name="SegC-grupo02- proj1-fase1" />
@@ -118,10 +118,10 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.IoTDevice" />
-        <item itemvalue="Application.IoTServer" />
         <item itemvalue="JAR Application.IoTDevice.jar (1)" />
         <item itemvalue="JAR Application.IoTServer.jar (1)" />
+        <item itemvalue="Application.IoTDevice" />
+        <item itemvalue="Application.IoTServer" />
         <item itemvalue="JAR Application.IoTDevice.jar" />
       </list>
     </recent_temporary>
@@ -153,7 +153,7 @@
       <workItem from="1711213451462" duration="27171000" />
       <workItem from="1711314383507" duration="5486000" />
       <workItem from="1711356317572" duration="1031000" />
-      <workItem from="1711412578804" duration="15196000" />
+      <workItem from="1711412578804" duration="16417000" />
     </task>
     <servers />
   </component>
