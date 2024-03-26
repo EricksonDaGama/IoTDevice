@@ -1,1 +1,1 @@
-IoTDevice.jar:694322
+IoTDevice.jar:692528
