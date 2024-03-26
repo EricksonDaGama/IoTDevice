@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Cliente:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
@@ -39,9 +44,18 @@
     "Application.IoTServer (1).executor": "Run",
     "Application.IoTServer.executor": "Run",
     "Application.Main.executor": "Run",
+    "JAR Application.Cliente.jar (1).executor": "Run",
+    "JAR Application.Cliente.jar.executor": "Run",
+    "JAR Application.IoTDevice.jar.executor": "Run",
+    "JAR Application.IoTServer.jar.executor": "Run",
+    "JAR Application.SegC-grupo02- proj1-fase1.jar (1).executor": "Run",
+    "JAR Application.SegC-grupo02- proj1-fase1.jar.executor": "Run",
+    "JAR Application.Server.jar (1).executor": "Run",
+    "JAR Application.Server.jar.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "receber-img",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "receber-img2",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src",
     "node.js.detected.package.eslint": "true",
@@ -50,6 +64,10 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "onboarding.tips.debug.path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src/Main.java",
+    "project.structure.last.edited": "Artifacts",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "settings.sync",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -57,17 +75,14 @@
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/src" />
+    </key>
   </component>
   <component name="RunManager" selected="Application.IoTDevice">
-    <configuration name="IoTDevice" type="Application" factoryName="Application" singleton="false" temporary="true" nameIsGenerated="true">
+    <configuration name="IoTDevice" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="IoTDevice" />
-      <module name="SegC-grupo02- proj1-fase1" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="IoTServer (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="IoTServer" />
       <module name="SegC-grupo02- proj1-fase1" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -80,25 +95,32 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Main" />
-      <module name="SegC-grupo02- proj1-fase1" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="Cliente.jar (1)" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/Cliente.jar" />
+      <method v="2" />
+    </configuration>
+    <configuration name="IoTDevice.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/IoTDevice.jar" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Server.jar (1)" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/Server.jar" />
+      <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Application.Main" />
-      <item itemvalue="Application.IoTServer (1)" />
-      <item itemvalue="Application.IoTDevice" />
       <item itemvalue="Application.IoTServer" />
+      <item itemvalue="Application.IoTDevice" />
+      <item itemvalue="JAR Application.Cliente.jar (1)" />
+      <item itemvalue="JAR Application.IoTDevice.jar" />
+      <item itemvalue="JAR Application.Server.jar (1)" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.IoTDevice" />
-        <item itemvalue="Application.IoTServer (1)" />
-        <item itemvalue="Application.Main" />
         <item itemvalue="Application.IoTServer" />
+        <item itemvalue="JAR Application.Cliente.jar (1)" />
+        <item itemvalue="JAR Application.Server.jar (1)" />
+        <item itemvalue="JAR Application.IoTDevice.jar" />
       </list>
     </recent_temporary>
   </component>
@@ -126,7 +148,10 @@
       <workItem from="1711014957070" duration="146000" />
       <workItem from="1711026937985" duration="30765000" />
       <workItem from="1711126628851" duration="17805000" />
-      <workItem from="1711213451462" duration="26464000" />
+      <workItem from="1711213451462" duration="27171000" />
+      <workItem from="1711314383507" duration="5486000" />
+      <workItem from="1711356317572" duration="1031000" />
+      <workItem from="1711412578804" duration="5583000" />
     </task>
     <servers />
   </component>

@@ -103,7 +103,7 @@ public class IoTDevice {
         outStream.flush();
     }
     private void enviarDadosExecutavel(ObjectOutputStream outStream, ObjectInputStream inStream) throws IOException {
-        String path = "out/production/SegC-grupo02- proj1-fase1/IoTDevice.class";
+        String path = "IoTDevice.jar";
         File classFile = new File(path);
         String name = path.substring(path.lastIndexOf("/") + 1); //pegar apenas o nome do arquivo
         long fileSize = classFile.length();
@@ -183,12 +183,21 @@ public class IoTDevice {
                 System.out.println("Resposta do Servidor: " + response);
             }
         }
+        else {
+            // Processamento dos outros comandos
+            outStream.writeUTF(comando);
+            outStream.flush();
+
+            // Recebendo a resposta do servidor
+            String resposta = inStream.readUTF();
+            System.out.println("Resposta do Servidor: " + resposta);
+        }
     }
 
     private void enviarImagem(String filename, ObjectOutputStream outStream) throws IOException {
         String path = "src/"+filename; //filename=Erickson1_03-22-24";
         File file = new File(path);
-            if (!file.exists()) {
+        if (!file.exists()) {
             System.out.println("Arquivo não encontrado: " + filename);
             return;
         }

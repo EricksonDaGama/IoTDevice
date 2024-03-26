@@ -114,7 +114,6 @@ public class IoTServer {
                     try {
                         String comando = inStream.readUTF();
                         String resposta = processarComando(comando,inStream,outStream);
-
                         System.out.println("agora vou enviar a resposta ao cliente sobre a imagem a resposta sera"+ resposta);
                         outStream.writeUTF(resposta);
                         outStream.flush();

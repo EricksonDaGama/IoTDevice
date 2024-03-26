@@ -1,1 +1,1 @@
-IoTDevice.class:9384
+IoTDevice.jar:694322
