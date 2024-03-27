@@ -13,6 +13,21 @@ public class IoTServer {
     private AuthenticationService authenticationService;
     private DeviceManager deviceManager;
     public IoTServer() {
+        
+        //Criar ficheiros de texto
+        File fileStarter = new File("users.txt");
+        try {
+            fileStarter.createNewFile();
+            fileStarter = new File("dominios.txt");
+            fileStarter.createNewFile();
+            fileStarter = new File("devices.txt");
+            fileStarter.createNewFile();
+            fileStarter = new File("executavel.txt");
+            fileStarter.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         executorService = Executors.newCachedThreadPool();
         authenticationService = new AuthenticationService();
         deviceManager = new DeviceManager();
@@ -24,6 +39,9 @@ public class IoTServer {
     public void startServer() {
         try (ServerSocket serverSocket = new ServerSocket(23456)) {
             System.out.println("Servidor iniciado.");
+
+            
+
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 executorService.submit(new ClientHandlerThread(clientSocket, authenticationService, deviceManager));
