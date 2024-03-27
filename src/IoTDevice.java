@@ -21,6 +21,12 @@ public class IoTDevice {
         devid = args[1];
         userid = args[2];
 
+        if(!devid.chars().allMatch(Character::isDigit)) {
+            System.out.println(
+                    "Error: Invalid DevID\nUsage: IoTDevice <serverAddress> <dev-id> <user-id>\n");
+            System.exit(1);
+        }
+
         new IoTDevice().iniciarCliente();
     }
     public void iniciarCliente() {
@@ -101,6 +107,12 @@ public class IoTDevice {
             } else if ("NOK-DEVID".equals(deviceResponse)) {
                 System.out.println(deviceResponse);
                 System.out.println("ID do dispositivo já em uso. Tente outro ID.");
+                devid = scanner.nextLine();
+                while(!devid.chars().allMatch(Character::isDigit)) {
+                    System.out.println(
+                            "ID do dispositivo inválido. Tente outro ID (numero inteiro).\n");
+                    devid = scanner.nextLine();
+                }
             } else {
                 System.out.println("Resposta não reconhecida: " + deviceResponse);
                 break;
