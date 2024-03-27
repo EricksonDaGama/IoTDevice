@@ -8,7 +8,7 @@ Este projeto consiste em um sistema cliente-servidor para dispositivos de Intern
 Abaixo estão as instruções para compilar e executar o projeto.
 
 Pré-Requisitos:
-- Java Development Kit (JDK) - Recomendado JDK 11 ou superior.
+- Java Development Kit (JDK) - Compilado com JDK 21.
 - Um editor de texto ou IDE de sua preferência (ex.: Eclipse, IntelliJ IDEA).
 
 Preparação Inicial:

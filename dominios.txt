@@ -24,3 +24,7 @@ Domínio: apagar
 Owner: Erickson
 Usuários com permissão: Erickson, Barata, Rodrigo
 Dispositivos registrados:  Erickson:33 Erickson:44, Rodrigo:1
+Domínio: ola
+Owner: rodri
+Usuários com permissão: rodri
+Dispositivos registrados: 
