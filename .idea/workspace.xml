@@ -38,41 +38,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.IoTDevice.executor": "Run",
-    "Application.IoTServer (1).executor": "Run",
-    "Application.IoTServer.executor": "Run",
-    "Application.Main.executor": "Run",
-    "JAR Application.Cliente.jar (1).executor": "Run",
-    "JAR Application.Cliente.jar.executor": "Run",
-    "JAR Application.IoTDevice.jar (1).executor": "Run",
-    "JAR Application.IoTDevice.jar.executor": "Run",
-    "JAR Application.IoTServer.jar (1).executor": "Run",
-    "JAR Application.IoTServer.jar.executor": "Run",
-    "JAR Application.SegC-grupo02- proj1-fase1.jar (1).executor": "Run",
-    "JAR Application.SegC-grupo02- proj1-fase1.jar.executor": "Run",
-    "JAR Application.Server.jar (1).executor": "Run",
-    "JAR Application.Server.jar.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "finalizar/testar",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src/Main.java",
-    "project.structure.last.edited": "Artifacts",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "settings.sync",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.IoTDevice.executor&quot;: &quot;Run&quot;,
+    &quot;Application.IoTServer (1).executor&quot;: &quot;Run&quot;,
+    &quot;Application.IoTServer.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.Cliente.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.Cliente.jar.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.IoTDevice.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.IoTDevice.jar.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.IoTServer.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.IoTServer.jar.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.SegC-grupo02- proj1-fase1.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.SegC-grupo02- proj1-fase1.jar.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.Server.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.Server.jar.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;finalizar/testar&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -85,7 +85,7 @@
     </key>
   </component>
   <component name="RunManager" selected="JAR Application.IoTDevice.jar (1)">
-    <configuration name="IoTDevice" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+    <configuration name="IoTDevice" type="Application" factoryName="Application" singleton="false" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="IoTDevice" />
       <module name="SegC-grupo02- proj1-fase1" />
       <option name="PROGRAM_PARAMETERS" value="localhost 44 Erickson" />
@@ -100,7 +100,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="IoTDevice.jar (1)" type="JarApplication" temporary="true">
+    <configuration name="IoTDevice.jar (1)" type="JarApplication" singleton="false" temporary="true">
       <option name="JAR_PATH" value="$PROJECT_DIR$/IoTDevice.jar" />
       <option name="PROGRAM_PARAMETERS" value="localhost 44 Erickson" />
       <option name="ALTERNATIVE_JRE_PATH" />
