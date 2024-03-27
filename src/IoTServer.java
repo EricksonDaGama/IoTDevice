@@ -109,10 +109,8 @@ public class IoTServer {
                     try {
                         String comando = inStream.readUTF();
                         String resposta = processarComando(comando,inStream,outStream);
-                        System.out.println("agora vou enviar a resposta ao cliente sobre a imagem a resposta sera"+ resposta);
                         outStream.writeUTF(resposta);
                         outStream.flush();
-                        System.out.println("enviei a resposta ");
                     } catch (IOException e) {
                         System.err.println("Erro ao ler comando: " + e.getMessage());
                         break;  // Sair do loop em caso de erro
@@ -181,6 +179,9 @@ public class IoTServer {
             return "Comando Desconhecido";
         }
         private String handleImageRequest(String deviceId, ObjectOutputStream outStream) throws IOException {
+            if(!deviceId.contains(":")){
+                return "NOID # esse device id não existe";
+            }
             String[] userName_idDevice=  deviceId.split(":");
             if (!deviceManager.isDeviceRegistered(userName_idDevice[0], userName_idDevice[1])) {
                 return "NOID # esse device id não existe";
@@ -192,7 +193,7 @@ public class IoTServer {
             if (imagePath == null || imagePath.isEmpty()) {
                 return "NODATA # esse device id não publicou dados";
             }
-            Path imageFile = Paths.get("src/dadosSensoriasClientes/", imagePath);
+            Path imageFile = Paths.get("dadosSensoriasClientes/", imagePath);
             if (!Files.exists(imageFile)) {
                 return "NODATA # imagem não encontrada";
             }
@@ -219,7 +220,7 @@ public class IoTServer {
         }
         private boolean isUserAllowedToReadDevice(String deviceId) throws IOException {
             boolean result=false;
-            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("dominios.txt"))) {
                 String line;
                 String currentDomain = null;
                 while ((line = br.readLine()) != null) {
@@ -242,7 +243,7 @@ public class IoTServer {
             // ...
             List<String> data = new ArrayList<>();
             Set<String> devicesInDomain = getDevicesInDomain(domain);
-            try (BufferedReader br = new BufferedReader(new FileReader("src/devices.txt"))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("devices.txt"))) {
                 String line;
                 String currentDevice = null;
                 while ((line = br.readLine()) != null) {
@@ -261,7 +262,7 @@ public class IoTServer {
         }
         private Set<String> getDevicesInDomain(String domain) throws IOException {
             Set<String> devices = new HashSet<>();
-            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("dominios.txt"))) {
                 String line;
                 boolean isCurrentDomain = false;
                 while ((line = br.readLine()) != null) {
@@ -313,7 +314,7 @@ public class IoTServer {
                     }
                     readBytes += result;
                 }
-                Path directoryPath = Paths.get("src/dadosSensoriasClientes/");
+                Path directoryPath = Paths.get("dadosSensoriasClientes/");
                 Path filePath = directoryPath.resolve(filename);
 
                 if (!Files.exists(directoryPath)) {
@@ -362,7 +363,7 @@ public class IoTServer {
                         return "NOK";  // Domínio já existe
                     }
                     // Adicionar o novo domínio ao arquivo
-                    try (FileWriter fw = new FileWriter("src/dominios.txt", true);
+                    try (FileWriter fw = new FileWriter("dominios.txt", true);
                          BufferedWriter bw = new BufferedWriter(fw)) {
                         bw.write("\nDomínio: " + nomeDominio + "\nOwner: " + username + "\nUsuários com permissão: " + username + "\nDispositivos registrados: \n");
                     }
@@ -374,7 +375,7 @@ public class IoTServer {
             }
         }
         private boolean dominioExiste(String nomeDominio) throws IOException {
-            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("dominios.txt"))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     if (line.contains("Domínio: " + nomeDominio)) {
@@ -409,7 +410,7 @@ public class IoTServer {
             }
         }
         private boolean isOwner(String dominio, String usuario) throws IOException {
-            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("dominios.txt"))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     if (line.contains("Domínio: " + dominio)) {
@@ -426,37 +427,46 @@ public class IoTServer {
         //Método para Adicionar Usuário ao Arquivo de Domínios:
         private void adicionarUsuarioAoArquivo(String user1, String dm) throws IOException {
             List<String> fileContent = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+            boolean foundDomain = false;
+            boolean updatedUsers = false;
+
+            try (BufferedReader br = new BufferedReader(new FileReader("dominios.txt"))) {
                 String line;
-                boolean found = false;
                 while ((line = br.readLine()) != null) {
                     if (line.contains("Domínio: " + dm)) {
-                        found = true;
-                        fileContent.add(line);
-                        fileContent.add(br.readLine()); // Adiciona a linha do Owner
-                        String usuarios = br.readLine();
-                        if (!usuarios.contains(user1)) {
-                            usuarios += ", " + user1;
-                        }
-                        fileContent.add(usuarios); // Adiciona usuários atualizados
+                        foundDomain = true;
+                        fileContent.add(line); // Adiciona linha do domínio
                         continue;
                     }
-                    if (found && line.isEmpty()) {
-                        found = false;
+                    if (foundDomain) {
+                        if (line.startsWith("Usuários com permissão:")) {
+                            if (!line.contains(user1)) {
+                                line += ", " + user1;
+                            }
+                            updatedUsers = true;
+                        } else if (line.startsWith("Dispositivos registrados:") && !updatedUsers) {
+                            // Esta condição garante que a linha de dispositivos seja preservada
+                            // mesmo se não houver atualização na lista de usuários
+                            String previousLine = fileContent.get(fileContent.size() - 1);
+                            previousLine += ", " + user1;
+                            fileContent.set(fileContent.size() - 1, previousLine);
+                        } else if (line.trim().isEmpty()) {
+                            foundDomain = false; // Finaliza a edição deste domínio
+                        }
                     }
-                    if (!found) {
-                        fileContent.add(line);
-                    }
+                    fileContent.add(line);
                 }
             }
+
             // Reescrever o arquivo com o conteúdo atualizado
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/dominios.txt"))) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("dominios.txt"))) {
                 for (String line : fileContent) {
                     bw.write(line);
                     bw.newLine();
                 }
             }
         }
+
         private String registrarDispositivoNoDominio(String dm) {
             synchronized (this) {
                 try {
@@ -485,7 +495,7 @@ public class IoTServer {
          * @throws IOException
          */
         private boolean isUserAllowed(String dm, String username) throws IOException {
-            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("dominios.txt"))) {
                 String line;
                 boolean isCurrentDomain = false;
                 while ((line = br.readLine()) != null) {
@@ -505,7 +515,7 @@ public class IoTServer {
             List<String> lines = new ArrayList<>();
             String dispositivo = username + ":" + devId;
 
-            try (BufferedReader br = new BufferedReader(new FileReader("src/dominios.txt"))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("dominios.txt"))) {
                 String line;
                 boolean foundDomain = false;
                 while ((line = br.readLine()) != null) {
@@ -519,8 +529,7 @@ public class IoTServer {
                     lines.add(line);
                 }
             }
-
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/dominios.txt"))) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("dominios.txt"))) {
                 for (String line : lines) {
                     bw.write(line);
                     bw.newLine();
@@ -529,7 +538,7 @@ public class IoTServer {
         }
         private boolean validarTamanhoExecutavel(String nomeArquivo, long tamanhoArquivo) {
             try {
-                File file = new File("src/executavel.txt");
+                File file = new File("executavel.txt");
                 System.out.println("tamanho que o cliente diz "+tamanhoArquivo);
                 System.out.println("o nome do arquivo é "+nomeArquivo);
 

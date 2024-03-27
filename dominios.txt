@@ -6,7 +6,7 @@ Dispositivos registrados: alan:2, alan:5, luis:3, luis:6
 Domínio: Office02
 Owner: carlos
 Usuários com permissão: carlos, anne, Rodrigo
-Dispositivos registrados: carlos:1, anne:4 Rodrigo:1
+Dispositivos registrados: carlos:1, anne:4, Rodrigo:1
 
 Domínio: Kitchen03
 Owner: emma
@@ -16,6 +16,11 @@ Dispositivos registrados: emma:7, lucas:8
 
 Domínio: Room01
 Owner: Rodrigo
-Usuários com permissão: Rodrigo, Erickson
-Dispositivos registrados: Rodrigo:1 Erickson:1
+Usuários com permissão: Rodrigo
+Dispositivos registrados: Rodrigo:1
 
+
+Domínio: apagar
+Owner: Erickson
+Usuários com permissão: Erickson, Barata, Rodrigo
+Dispositivos registrados:  Erickson:33 Erickson:44, Rodrigo:1

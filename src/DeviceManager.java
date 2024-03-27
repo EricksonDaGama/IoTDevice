@@ -1,7 +1,6 @@
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
 public class DeviceManager {
     private Map<String, String> registeredDevices;
     private Map<String,String> activeSessions;
@@ -40,14 +39,11 @@ public class DeviceManager {
     public synchronized boolean updateDeviceTemperature(String username, String devId, float temperatura) {
         Map<String, DeviceData> devices = loadDevices();
         String dispositivoKey = username + ":" + devId;
-
         DeviceData data = devices.getOrDefault(dispositivoKey, new DeviceData(null, ""));
         data.temperatura = temperatura; // Atualiza a temperatura
         devices.put(dispositivoKey, data);
-
         return saveDevices(devices);
     }
-
     public synchronized boolean updateDeviceImage(String username, String devId, String filename) {
         Map<String, DeviceData> devices = loadDevices();
         String dispositivoKey = username + ":" + devId;
@@ -57,14 +53,12 @@ public class DeviceManager {
         devices.put(dispositivoKey, data);
         return saveDevices(devices);
     }
-
     private Map<String, DeviceData> loadDevices() {
         Map<String, DeviceData> devices = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/devices.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("devices.txt"))) {
             String line;
             String currentDevice = null;
             DeviceData currentData = null;
-
             while ((line = reader.readLine()) != null) {
                 if (line.trim().startsWith("Dispositivo:")) {
                     if (currentDevice != null && currentData != null) {
@@ -94,11 +88,9 @@ public class DeviceManager {
         }
         return devices;
     }
-
     private boolean saveDevices(Map<String, DeviceData> devices) {
         List<String> fileContent = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader("src/devices.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("devices.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 fileContent.add(line);
@@ -119,7 +111,6 @@ public class DeviceManager {
                     break;
                 }
             }
-
             // Se encontrou, atualiza os dados; se não, adiciona
             if (deviceIndex != -1) {
                 updateDeviceData(fileContent, deviceIndex, entry.getValue());
@@ -127,9 +118,8 @@ public class DeviceManager {
                 addNewDeviceData(fileContent, dispositivoKey, entry.getValue());
             }
         }
-
         // Escrever todas as linhas de volta no arquivo
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/devices.txt"))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("devices.txt"))) {
             for (String fileLine : fileContent) {
                 bw.write(fileLine);
                 bw.newLine();
@@ -138,10 +128,8 @@ public class DeviceManager {
             e.printStackTrace();
             return false;
         }
-
         return true;
     }
-
     private void updateDeviceData(List<String> fileContent, int deviceIndex, DeviceData data) {
         String temperaturaStr = (data.temperatura != null) ? "Última Temperatura: " + data.temperatura + "°C" : "Última Temperatura: ";
         fileContent.set(deviceIndex + 1, temperaturaStr);
@@ -156,7 +144,7 @@ public class DeviceManager {
     }
     public synchronized boolean isDeviceRegistered(String username, String devId) {
         String dispositivoKey = username + ":" + devId;
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/dominios.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("dominios.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().startsWith("Dispositivos registrados:")) {
@@ -170,28 +158,8 @@ public class DeviceManager {
         }
         return false;
     }
-    public synchronized Set<String> dominiosOfDevice(String dispositive) {
-        Set<String> dominios=new HashSet<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/dominios.txt"))) {
-            String line;
-            String dominio="";
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().startsWith("Domínio:")) {
-                    dominio=line.split(" ")[1];
-                }
-                if (line.trim().startsWith("Dispositivos registrados:")) {
-                    if (line.contains(dispositive)) {
-                        dominios.add(dominio);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return dominios;
-    }
     public String getDeviceImagePath(String deviceId) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/devices.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("devices.txt"))) {
             String line;
             boolean isCurrentDevice = false;
             while ((line = reader.readLine()) != null) {

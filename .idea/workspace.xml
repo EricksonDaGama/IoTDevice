@@ -59,7 +59,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "finalizar/testar",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src",
+    "last_opened_file_path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -75,10 +75,12 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/dadosSensoriasClientes" />
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
@@ -86,6 +88,7 @@
     <configuration name="IoTDevice" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="IoTDevice" />
       <module name="SegC-grupo02- proj1-fase1" />
+      <option name="PROGRAM_PARAMETERS" value="localhost 44 Erickson" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -99,6 +102,8 @@
     </configuration>
     <configuration name="IoTDevice.jar (1)" type="JarApplication" temporary="true">
       <option name="JAR_PATH" value="$PROJECT_DIR$/IoTDevice.jar" />
+      <option name="PROGRAM_PARAMETERS" value="localhost 44 Erickson" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method v="2" />
     </configuration>
     <configuration name="IoTDevice.jar" type="JarApplication" temporary="true">
@@ -153,7 +158,8 @@
       <workItem from="1711213451462" duration="27171000" />
       <workItem from="1711314383507" duration="5486000" />
       <workItem from="1711356317572" duration="1031000" />
-      <workItem from="1711412578804" duration="16417000" />
+      <workItem from="1711412578804" duration="28289000" />
+      <workItem from="1711556071646" duration="6416000" />
     </task>
     <servers />
   </component>

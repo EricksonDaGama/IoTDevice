@@ -3,7 +3,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AuthenticationService {
-    private final String USERS_FILE = "src/users.txt";
+    private final String USERS_FILE = "users.txt";
     private Map<String, String> userCredentials;
 
     public AuthenticationService() {
