@@ -1,3 +1,6 @@
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -37,17 +40,16 @@ public class IoTServer {
         new IoTServer().startServer();
     }
     public void startServer() {
-        try (ServerSocket serverSocket = new ServerSocket(23456)) {
-            System.out.println("Servidor iniciado.");
-
-            
+        try {
+            ServerSocketFactory ssf = SSLServerSocketFactory.getDefault();
+            SSLServerSocket ss = (SSLServerSocket) ssf.createServerSocket(9096);
 
             while (true) {
-                Socket clientSocket = serverSocket.accept();
-                executorService.submit(new ClientHandlerThread(clientSocket, authenticationService, deviceManager));
+                ss.accept();
+                executorService.submit(new ClientHandlerThread(ss, authenticationService, deviceManager));
             }
         } catch (IOException e) {
-            System.err.println("Erro ao iniciar o servidor: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
     private void startSessionCleanupThread() {
@@ -78,13 +80,13 @@ public class IoTServer {
         public void run() {
             try {
                 ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream());
+                BufferedReader inStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
                 //1-recebendo dados do cliente
                 boolean authenticated = false;
                 while (!authenticated) {
-                    username = (String) inStream.readObject();
-                    String password = (String) inStream.readObject();
+                    username = (String) inStream.readLine();
+                    String password = (String) inStream.readLine();
 
                     String authResponse = authenticationService.handleAuthentication(username, password);
                     long currentTime = System.currentTimeMillis();
@@ -100,7 +102,7 @@ public class IoTServer {
                 //2-recebendo dados do device-id
                 boolean deviceRegistered = false;
                 while (!deviceRegistered) {
-                    devId = (String) inStream.readObject();
+                    devId = (String) inStream.readLine();
                     boolean isRegistered = deviceManager.registerDevice(username, devId);
 
                     if (!isRegistered) {
@@ -112,8 +114,8 @@ public class IoTServer {
                     outStream.flush();
                 }
                 //3-Recebendo dados do executável
-                String nomeArquivo = inStream.readUTF();
-                long tamanhoArquivo = inStream.readLong();
+                String nomeArquivo = inStream.readLine();
+                long tamanhoArquivo = Long.parseLong(inStream.readLine());
 
                 if (validarTamanhoExecutavel(nomeArquivo, tamanhoArquivo)) {
                     outStream.writeUTF("OK-TESTED");
@@ -125,7 +127,7 @@ public class IoTServer {
                 //4- recebendo o comando que o cliente quer
                 while (!clientSocket.isClosed()) {
                     try {
-                        String comando = inStream.readUTF();
+                        String comando = inStream.readLine();
                         String resposta = processarComando(comando,inStream,outStream);
                         outStream.writeUTF(resposta);
                         outStream.flush();
@@ -134,7 +136,7 @@ public class IoTServer {
                         break;  // Sair do loop em caso de erro
                     }
                 }
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException e) {
                 System.err.println("Erro ao tratar cliente: " + e.getMessage());
                 // Tratar a exceção conforme necessário
             } finally {
@@ -151,7 +153,7 @@ public class IoTServer {
                 }
             }
         }
-        private String processarComando(String comando,ObjectInputStream inStream,ObjectOutputStream outStream) throws IOException {
+        private String processarComando(String comando,BufferedReader inStream,ObjectOutputStream outStream) throws IOException {
             // Analise o comando e execute a ação correspondente
             // Por exemplo, se o comando for "CREATE <dm>", crie um novo domínio
             // Retorne uma resposta baseada no resultado da ação
@@ -316,13 +318,13 @@ public class IoTServer {
             outStream.write(fileContent);
             outStream.flush();
         }
-        private String handleImageUpload(String[] partes, ObjectInputStream inStream) {
+        private String handleImageUpload(String[] partes, BufferedReader inStream) {
             if (partes.length != 2) {
                 return "NOK"; // Formato de comando inválido
             }
             try {
                 String filename = partes[1];
-                long fileSize = inStream.readLong();
+                long fileSize = Long.parseLong(inStream.readLine());
                 byte[] imageBytes = new byte[(int) fileSize];
                 int readBytes = 0;
                 while (readBytes < fileSize) {
@@ -559,6 +561,7 @@ public class IoTServer {
                 File file = new File("executavel.txt");
                 System.out.println("tamanho que o cliente diz "+tamanhoArquivo);
                 System.out.println("o nome do arquivo é "+nomeArquivo);
+
 
                 Scanner scanner = new Scanner(file);
                 while (scanner.hasNextLine()) {
