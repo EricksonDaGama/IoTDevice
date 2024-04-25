@@ -1,7 +1,7 @@
 #!/bin/bash
 
 file_path="IoTDevice.jar"
-output_file="attestation.txt"
+output_file="Info_IoTDevice.txt"
 
 # Get the byte size of the file
 byte_size=$(wc -c < "$file_path")
