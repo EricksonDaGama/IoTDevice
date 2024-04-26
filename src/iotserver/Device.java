@@ -3,100 +3,107 @@ package src.iotserver;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Device {
-    private String userId;
-    private String devId;
-    private String fullId;
 
-    private boolean online;
-    private String imgPath;
-    private Float temp;
-    private Set<String> registeredDomains;
+    public class Device {
+        private String userId;
+        private String devId;
+        private String fullId;
 
-    public Device(String fullId) {
-        this(fullId.split(":")[0], fullId.split(":")[1]);
-    }
+        private boolean online;
+        private String imgPath;
+        private Float temp;
+        private Set<String> registeredDomains;
 
-    public Device(String userId, String devId) {
-        this.userId = userId;
-        this.devId = devId;
-        this.fullId = userId + ":" + devId;
-        this.online = false;
-        this.imgPath = null;
-        this.temp = null;
-        this.registeredDomains = new HashSet<>();
-    }
+        public Device(String fullId) {
+            this(fullId.split(":")[0], fullId.split(":")[1]);
+        }
 
-    public boolean isOnline() {
-        return online;
-    }
+        public Device(String userId, String devId) {
+            this.userId = userId;
+            this.devId = devId;
+            this.fullId = String.join(":", userId, devId);
+            this.online = false;
+            this.imgPath = null;
+            this.temp = null;
+            this.registeredDomains = new HashSet<>();
+        }
 
-    public void goOnline() {
-        online = true;
-    }
+        public boolean isOnline() {
+            return online;
+        }
 
-    public void goOffline() {
-        online = false;
-    }
+        public void goOnline() {
+            online = true;
+        }
 
-    public String fullId() {
-        return userId + ":" + devId;
-    }
+        public void goOffline() {
+            online = false;
+        }
 
-    public void registerImage(String imgPath) {
-        this.imgPath=imgPath;
-    }
+        public String fullId() {
+            return fullId;
+        }
 
-    public void registerInDomain(String domainName) {
-        registeredDomains.add(domainName);
-    }
+        public void registerImage(String imgPath) {
+            this.imgPath = imgPath;
+        }
 
-    public void registerTemperature(float temperature) {
-        temp = temperature;
-    }
+        public void registerInDomain(String domainName) {
+            registeredDomains.add(domainName);
+        }
 
-    public Float getTemperature(){
-        return this.temp;
-    }
+        public void registerTemperature(float temperature) {
+            temp = temperature;
+        }
 
-    public String getImagePath() {
-        return imgPath;
-    }
+        public Float getTemperature() {
+            return temp;
+        }
 
-    public Set<String> getDomains(){
-        return this.registeredDomains;
-    }
+        public String getImagePath() {
+            return imgPath;
+        }
 
+        public Set<String> getDomains() {
+            return new HashSet<>(registeredDomains);
+        }
 
-    @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
+        if (this == obj) return true;
         if (!(obj instanceof Device)) return false;
 
         Device other = (Device) obj;
-        return this.userId.equals(other.userId) && 
-                this.devId.equals(other.devId);
+        return (userId != null ? userId.equals(other.userId) : other.userId == null) &&
+                (devId != null ? devId.equals(other.devId) : other.devId == null);
     }
+
+
 
     @Override
     public int hashCode() {
-        int code = this.userId.hashCode();
-        code = 31 * code + this.devId.hashCode();
-        return code;
+        return 31 * this.userId.hashCode() + this.devId.hashCode();
     }
+
 
     @Override
     public String toString() {
+        return formatOutput();
+    }
+
+    private String formatOutput() {
         final char NL = '\n';
         final char SP = ':';
 
-        String temperature = getTemperature() != null ?
-            Float.toString(getTemperature()) : "";
-        String imagePath = getImagePath() != null ?
-            getImagePath() : "";
+        String temperature = (getTemperature() != null) ? Float.toString(getTemperature()) : "";
+        String imagePath = (getImagePath() != null) ? getImagePath() : "";
 
         StringBuilder sb = new StringBuilder();
-        sb.append(fullId() + SP + temperature + SP + imagePath + NL);
+        sb.append(fullId()).append(SP)
+                .append(temperature).append(SP)
+                .append(imagePath).append(NL);
+
         return sb.toString();
     }
+
+
 }
