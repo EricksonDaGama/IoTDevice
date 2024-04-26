@@ -36,10 +36,10 @@ public class AuthenticationService {
             System.err.println("Erro ao ler o arquivo de credenciais: " + e.getMessage());
         }
     }
-    private void saveNewUser(String username, String password) {
+    public void saveNewUser(String username, String cer) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(USERS_FILE, true))) {
-            writer.write(username + ":" + password + "\n");
-            userCredentials.put(username, password);
+            writer.write(username + ":" + cer + "\n");
+            userCredentials.put(username, cer);
         } catch (IOException e) {
             System.err.println("Erro ao salvar novo usuário: " + e.getMessage());
         }

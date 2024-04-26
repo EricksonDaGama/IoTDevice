@@ -12,6 +12,16 @@ import javax.net.ssl.SSLServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.SignedObject;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 public class IoTServer {
     
     private int port; 
@@ -118,7 +128,7 @@ public class IoTServer {
         private Socket clientSocket;
         private AuthenticationService authenticationService;
         private DeviceManager deviceManager;
-        private String username;
+        private String userid;
         private String devId;
         ServerThread(Socket socket, AuthenticationService authService, DeviceManager deviceMgr) {
             this.clientSocket = socket;
@@ -135,25 +145,53 @@ public class IoTServer {
                 //1-recebendo dados do cliente
                 boolean authenticated = false;
                 while (!authenticated) {
-                    username = (String) inStream.readObject();
-                    String password = (String) inStream.readObject();
+                    userid = (String) inStream.readObject();
 
-                    String authResponse = authenticationService.handleAuthentication(username, password);
-                    long currentTime = System.currentTimeMillis();
-                    outStream.writeUTF(authResponse);
-                    outStream.writeLong(currentTime);
-                    outStream.flush();
+                    SecureRandom secureRandom = new SecureRandom();
+                    byte[] nonce = new byte[8];
+                    secureRandom.nextBytes(nonce);
 
-                    if (authResponse.equals("OK-USER") || authResponse.equals("OK-NEW-USER")) {
-                        System.out.printf("Cliente %s iniciou secção \n",username);
-                        authenticated = true;
+                    Signature signature = Signature.getInstance("MD5withRSA");
+                    
+                    if (authenticationService.userExists(userid)) {
+
+                        SignedObject signedObject = (SignedObject) inStream.readObject();
+                        FileInputStream fileInputStream = new FileInputStream("output/client/" + userid + "/" + userid + ".cer");
+                        CertificateFactory cf = CertificateFactory.getInstance("X509");
+                        Certificate certificate = cf.generateCertificate(fileInputStream);
+                        PublicKey publicKey = certificate.getPublicKey();
+
+                        if (Arrays.equals((byte[]) signedObject.getObject(), nonce)
+							&& signedObject.verify(publicKey, signature)) {
+						    outStream.writeObject(true);
+                        } else {
+                            outStream.writeObject(false);
+                        }
+                            
+                        outStream.writeObject(authenticationService.userExists(userid));
+                    } else {
+                        byte[] receivedNonce = (byte[]) inStream.readObject();
+                        byte[] signatureBytes = (byte[]) inStream.readObject();
+                        Certificate certificate = (Certificate) inStream.readObject();
+                        PublicKey publicKey = certificate.getPublicKey();
+                        signature.initVerify(publicKey);
+    
+                        if (Arrays.equals(receivedNonce, nonce) && signature.verify(signatureBytes)) {
+    
+                            authenticationService.saveNewUser(userid, "output/client/" + userid + "/" + userid + ".cer");
+
+                            outStream.writeObject(true);
+                        } else {
+                            outStream.writeObject(false);
+                        }
                     }
+    
                 }
                 //2-recebendo dados do device-id
                 boolean deviceRegistered = false;
                 while (!deviceRegistered) {
                     devId = (String) inStream.readObject();
-                    boolean isRegistered = deviceManager.registerDevice(username, devId);
+                    boolean isRegistered = deviceManager.registerDevice(userid, devId);
 
                     if (!isRegistered) {
                         outStream.writeUTF("NOK-DEVID");
@@ -189,10 +227,18 @@ public class IoTServer {
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Erro ao tratar cliente: " + e.getMessage());
                 // Tratar a exceção conforme necessário
+            } catch (CertificateException e) {
+                e.printStackTrace();
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            } catch (SignatureException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
             } finally {
                 // A lógica de limpeza e fechamento do socket
-                if (username != null && devId != null) {
-                    deviceManager.removeActiveSession(username, devId);
+                if (userid != null && devId != null) {
+                    deviceManager.removeActiveSession(userid, devId);
                 }
                 try {
                     if (clientSocket != null) {
@@ -252,8 +298,8 @@ public class IoTServer {
             if(!deviceId.contains(":")){
                 return "NOID # esse device id não existe";
             }
-            String[] userName_idDevice=  deviceId.split(":");
-            if (!deviceManager.isDeviceRegistered(userName_idDevice[0], userName_idDevice[1])) {
+            String[] userid_idDevice=  deviceId.split(":");
+            if (!deviceManager.isDeviceRegistered(userid_idDevice[0], userid_idDevice[1])) {
                 return "NOID # esse device id não existe";
             }
             if (!isUserAllowedToReadDevice(deviceId)) {
@@ -275,7 +321,7 @@ public class IoTServer {
                 return "NODM # esse domínio não existe";
             }
 
-            if (!isUserAllowed(domain, username)) {
+            if (!isUserAllowed(domain, userid)) {
                 return "NOPERM # sem permissões de leitura";
             }
 
@@ -300,7 +346,7 @@ public class IoTServer {
                     if (line.startsWith("Dispositivos registrados:") && currentDomain != null) {
                         if (line.contains(deviceId)) {
                             // Dispositivo encontrado no domínio, verificar permissão do usuário
-                            if(isUserAllowed(currentDomain, username) !=false)
+                            if(isUserAllowed(currentDomain, userid) !=false)
                                 result=true;
                         }
                     }
@@ -394,11 +440,11 @@ public class IoTServer {
                 try (OutputStream os = Files.newOutputStream(filePath, StandardOpenOption.CREATE)) {
                     os.write(imageBytes);
                 }
-//                if (deviceManager.isDeviceRegistered(username, devId)) {
+//                if (deviceManager.isDeviceRegistered(userid, devId)) {
                // Se o device está ou não num domínio, é irrelevante para os dados ficarem guardados no servidor.
-//                    return deviceManager.updateDeviceImage(username, devId, filename) ? "OK" : "NOK";
+//                    return deviceManager.updateDeviceImage(userid, devId, filename) ? "OK" : "NOK";
 //                }
-                return deviceManager.updateDeviceImage(username, devId, filename) ? "OK" : "NOK";
+                return deviceManager.updateDeviceImage(userid, devId, filename) ? "OK" : "NOK";
 
 
             } catch (IOException e) {
@@ -412,12 +458,12 @@ public class IoTServer {
             }
             try {
                 float temperatura = Float.parseFloat(partes[1]);
-//                if (deviceManager.isDeviceRegistered(username, devId)) {
+//                if (deviceManager.isDeviceRegistered(userid, devId)) {
 // Se o device está ou não num domínio, é irrelevante para os dados ficarem guardados no servidor.
-//                    return deviceManager.updateDeviceTemperature(username, devId, temperatura) ? "OK" : "NOK";
+//                    return deviceManager.updateDeviceTemperature(userid, devId, temperatura) ? "OK" : "NOK";
 //                }
-//                System.out.println("temperatura do dispositivo "+ username+":"+devId+" registada");
-                return deviceManager.updateDeviceTemperature(username, devId, temperatura) ? "OK" : "NOK";
+//                System.out.println("temperatura do dispositivo "+ userid+":"+devId+" registada");
+                return deviceManager.updateDeviceTemperature(userid, devId, temperatura) ? "OK" : "NOK";
 
             } catch (NumberFormatException e) {
                 return "NOK"; // Formato de temperatura inválido
@@ -435,7 +481,7 @@ public class IoTServer {
                     // Adicionar o novo domínio ao arquivo
                     try (FileWriter fw = new FileWriter("dominios.txt", true);
                          BufferedWriter bw = new BufferedWriter(fw)) {
-                        bw.write("\nDomínio: " + nomeDominio + "\nOwner: " + username + "\nUsuários com permissão: " + username + "\nDispositivos registrados: \n");
+                        bw.write("\nDomínio: " + nomeDominio + "\nOwner: " + userid + "\nUsuários com permissão: " + userid + "\nDispositivos registrados: \n");
                     }
                     return "OK";  // Domínio criado com sucesso
                 } catch (IOException e) {
@@ -463,7 +509,7 @@ public class IoTServer {
                         return "NODM";  // Domínio não existe
                     }
                     // Verificar se o solicitante é o Owner do domínio
-                    if (!isOwner(dm, username)) {
+                    if (!isOwner(dm, userid)) {
                         return "NOPERM";  // Sem permissão
                     }
                     // Verificar se o usuário a ser adicionado existe
@@ -543,7 +589,7 @@ public class IoTServer {
                     if (!dominioExiste(dm)) {
                         return "NODM";  // O domínio não existe
                     }
-                    if (!isUserAllowed(dm, username)) {
+                    if (!isUserAllowed(dm, userid)) {
                         return "NOPERM";  // O usuário não tem permissão
                     }
                     registrarDispositivoNoArquivo(dm);
@@ -560,11 +606,11 @@ public class IoTServer {
          * Para isso, ela lê o arquivo dominios.txt e verifica se o
          * usuário está listado como tendo permissão para esse domínio.
          * @param dm
-         * @param username
+         * @param userid
          * @return
          * @throws IOException
          */
-        private boolean isUserAllowed(String dm, String username) throws IOException {
+        private boolean isUserAllowed(String dm, String userid) throws IOException {
             try (BufferedReader br = new BufferedReader(new FileReader("dominios.txt"))) {
                 String line;
                 boolean isCurrentDomain = false;
@@ -572,7 +618,7 @@ public class IoTServer {
                     if (line.contains("Domínio: " + dm)) {
                         isCurrentDomain = true;
                     } else if (isCurrentDomain && line.contains("Usuários com permissão:")) {
-                        return line.contains(username);
+                        return line.contains(userid);
                     } else if (line.startsWith("Domínio:")) {
                         isCurrentDomain = false;
                     }
@@ -583,7 +629,7 @@ public class IoTServer {
         private void registrarDispositivoNoArquivo(String dm) throws IOException {
             // A lógica abaixo é simplificada e pode precisar ser adaptada para o seu caso específico
             List<String> lines = new ArrayList<>();
-            String dispositivo = username + ":" + devId;
+            String dispositivo = userid + ":" + devId;
 
             try (BufferedReader br = new BufferedReader(new FileReader("dominios.txt"))) {
                 String line;
