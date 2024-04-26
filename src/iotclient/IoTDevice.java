@@ -32,7 +32,7 @@ public class IoTDevice {
     static String serverAddress;
     static String truststore;
     static String keystore;
-    static String psw_keystore;
+    static String keystorePw;
     static ObjectInputStream in;
     static ObjectOutputStream out;
 
@@ -60,7 +60,7 @@ public class IoTDevice {
         serverAddress = args[0];
         truststore = args[1];
         keystore = args[2];
-        psw_keystore = args[3];
+        keystorePw = args[3];
         devid = args[4];
         userid = args[5];
 
@@ -68,14 +68,14 @@ public class IoTDevice {
         System.setProperty("javax.net.ssl.trustStorePassword", "");
         System.setProperty("javax.net.ssl.trustStoreType", "JCEKS");
         System.setProperty("javax.net.ssl.keyStore", keystore);
-        System.setProperty("javax.net.ssl.keyStorePassword", psw_keystore);
+        System.setProperty("javax.net.ssl.keyStorePassword", keystorePw);
         System.setProperty("javax.net.ssl.keyStoreType", "JCEKS");
 
         // Connection & Authentication
         if (connect(serverAddress)) {
             twoFactorAuth(userid);
             remoteAttestation(devid);
-            printMenu();
+            menu();
             // Program doesn't end until CTRL+C is pressed
             while (true) {// Steps 8 - 10
                 System.out.print("> ");
@@ -171,8 +171,8 @@ public class IoTDevice {
 
                 FileInputStream kfile = new FileInputStream(keystore);
                 KeyStore kstore = KeyStore.getInstance("JCEKS");
-                kstore.load(kfile, psw_keystore.toCharArray());
-                PrivateKey privKey = (PrivateKey) kstore.getKey(user, psw_keystore.toCharArray());
+                kstore.load(kfile, keystorePw.toCharArray());
+                PrivateKey privKey = (PrivateKey) kstore.getKey(user, keystorePw.toCharArray());
 
                 // MessageCode used as flag
                 MessageCode code = (MessageCode) in.readObject();
@@ -356,7 +356,7 @@ public class IoTDevice {
                 break;
             case "H":
             case "HELP":
-                printMenu();
+                menu();
                 break;
             default:
                 System.out.println("That command does not exist.");
@@ -602,46 +602,9 @@ public class IoTDevice {
     }
 
     /**
-     * Sends the name and size of the IoTDevice file to the server for remote
-     * attestation.
-     */
-    private static void testDevice() {
-        try {
-            File iotFile = new File(deviceJar);
-            // Send Test Device message
-            out.writeObject(MessageCode.TD);
-            // Send IoTDevice file name
-            out.writeObject(iotFile.getName());
-            // Send IoTDevice file size
-            out.writeLong(iotFile.length());
-            // Long mock_size = (long) 3;
-            // out.writeLong(mock_size);
-            // Receive message
-            System.out.println(iotFile.getName() + ": " + iotFile.length());
-            out.flush();
-            MessageCode code = (MessageCode) in.readObject();
-            switch (code) {
-                case NOK_TESTED:
-                    System.out.println(MessageCode.NOK_TESTED.getDesc());
-                    System.exit(-1);
-                    break;
-                case OK_TESTED:
-                    System.out.println(MessageCode.OK_TESTED.getDesc());
-                    break;
-                default:
-                    break;
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Prints the menu.
      */
-    private static void printMenu() {
+    private static void menu() {
         System.out.println("\n");
         System.out.println("******** IoTDevice ********");
         System.out.println("CREATE <dm> # Criar domínio - utilizador é Owner");
@@ -649,20 +612,10 @@ public class IoTDevice {
         System.out.println("RD <dm> # Registar o Dispositivo atual no domínio <dm>");
         System.out.println("ET <float> # Enviar valor <float> de Temperatura para o servidor.");
         System.out.println("EI <filename.jpg> # Enviar Imagem <filename.jpg> para o servidor.");
-        System.out.println("RT <dm> # Receber as últimas medições de Temperatura de cada dispositivo"
-                + " do domínio <dm>, desde que o utilizador tenha permissões.");
-        System.out.println("RI <user-id>:<dev_id> # Receber o ficheiro Imagem do dispositivo "
-                + "<user-id>:<dev_id> do servidor, desde que o utilizador tenha permissões.");
-        System.out.println("HELP # Mostrar este menu.");
-
+        System.out.println("RT <dm> # Receber as últimas medições de Temperatura de cada dispositivo do domínio <dm>, desde que o utilizador tenha permissões.");
+        System.out.println("RI <user-id>:<dev_id> # Receber o ficheiro Imagem do dispositivo <user-id>:<dev_id> do servidor, desde que o utilizador tenha permissões.");
     }
 
-    /**
-     * Takes a server adress String and connects the client to the specified server.
-     * 
-     * @param serverAddress - String {@code <serverAddress>} that identifies the
-     *                      server. Format: {@code<IP/hostname>[:Port]}
-     */
     private static Boolean connect(String serverAddress) {
         // Check if port was given
         String[] address_port = serverAddress.split(":");
@@ -689,50 +642,4 @@ public class IoTDevice {
         }
         return false;
     }
-
-    /**
-     * Sends device ID for authentication.
-     * 
-     * @param deviceID
-     */
-    /*
-     * private static void deviceAuth(String deviceID) {
-     * try {
-     * System.out.println("Starting device ID authentication.");
-     * out.writeObject(MessageCode.AD);
-     * out.writeObject(deviceID);
-     * boolean validID = false;
-     * 
-     * // out.writeObject(deviceID); //probably only once
-     * 
-     * do {
-     * MessageCode code = (MessageCode) in.readObject();
-     * switch (code) {
-     * case NOK_DEVID:
-     * System.out.println(MessageCode.NOK_DEVID.getDesc());
-     * 
-     * // Scanner sc = new Scanner(System.in);
-     * System.out.println("New device ID:");
-     * String newID = sc.nextLine();
-     * // sc.close();
-     * out.writeObject(MessageCode.AD);
-     * out.writeObject(newID);
-     * break;
-     * case OK_DEVID:
-     * System.out.println(MessageCode.OK_DEVID.getDesc());
-     * validID = true;
-     * default:
-     * break;
-     * }
-     * } while (!validID);
-     * 
-     * } catch (IOException e) {
-     * System.err.println("ERROR" + e.getMessage());
-     * System.exit(-1);
-     * } catch (ClassNotFoundException e) {
-     * e.printStackTrace();
-     * System.exit(-1);
-     * }
-     * }
-     */
 }

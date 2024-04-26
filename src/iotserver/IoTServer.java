@@ -174,19 +174,14 @@ public class IoTServer {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (InvalidKeyException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (CertificateException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (NoSuchAlgorithmException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (SignatureException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
