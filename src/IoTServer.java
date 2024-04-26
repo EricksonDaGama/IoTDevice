@@ -5,15 +5,34 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocket;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 public class IoTServer {
-    private ExecutorService executorService;
+    
+    private int port; 
+    private String passwordCifra; 
+    private String keystore;
+    private String keystorePassword;
+    private String api;
+
+    private SSLServerSocket ss;
+
     private AuthenticationService authenticationService;
     private DeviceManager deviceManager;
-    public IoTServer() {
+    public IoTServer(int port, String passwordCifra, String keystore, String keystorePassword, String api) {
         
+        this.port = port;
+        this.passwordCifra = passwordCifra;
+        this.keystore = keystore;
+        this.keystorePassword = keystorePassword;
+        this.api = api;
+        ss = null;
+
         //Criar ficheiros de texto
         File fileStarter = new File("users.txt");
         try {
@@ -28,23 +47,56 @@ public class IoTServer {
             e.printStackTrace();
         }
 
-        executorService = Executors.newCachedThreadPool();
+        //executorService = Executors.newCachedThreadPool();
         authenticationService = new AuthenticationService();
         deviceManager = new DeviceManager();
         startSessionCleanupThread();
     }
     public static void main(String[] args) {
-        new IoTServer().startServer();
+        
+        int port = 12345; 
+        String passwordCifra = ""; 
+        String keystore = "";
+        String keystorePassword = "";
+        String api = "";
+
+        if (args.length == 5) {
+            
+            port = Integer.parseInt(args[0]);
+            passwordCifra = args[1];
+            keystore = args[2];
+            keystorePassword = args[3];
+            api = args[4];
+        } else if (args.length == 4) {
+            passwordCifra = args[0];
+            keystore = args[1];
+            keystorePassword = args[2];
+            api = args[3];
+        } else {
+            System.out.println("Invalid number of args");
+            System.exit(-1);
+        }
+
+
+        new IoTServer(port, passwordCifra, keystore, keystorePassword, api).startServer();
     }
     public void startServer() {
-        try (ServerSocket serverSocket = new ServerSocket(23456)) {
-            System.out.println("Servidor iniciado.");
 
+        System.setProperty("javax.net.ssl.keyStore", keystore);
+		System.setProperty("javax.net.ssl.keyStorePassword", keystorePassword);
+        System.setProperty("javax.net.ssl.keyStoreType", "JCEKS");
+
+        ServerSocketFactory ssf = ServerSocketFactory.getDefault();
+        
+        try  {
+            System.out.println("Servidor iniciado.");
             
+            ss = (SSLServerSocket) ssf.createServerSocket(port);
 
             while (true) {
-                Socket clientSocket = serverSocket.accept();
-                executorService.submit(new ClientHandlerThread(clientSocket, authenticationService, deviceManager));
+                Socket clientSocket = ss.accept();
+                ServerThread thread = new ServerThread(clientSocket, authenticationService, deviceManager);
+                thread.start();
             }
         } catch (IOException e) {
             System.err.println("Erro ao iniciar o servidor: " + e.getMessage());
@@ -62,13 +114,13 @@ public class IoTServer {
             }
         }).start();
     }
-    class ClientHandlerThread implements Runnable {
+    class ServerThread extends Thread {
         private Socket clientSocket;
         private AuthenticationService authenticationService;
         private DeviceManager deviceManager;
         private String username;
         private String devId;
-        ClientHandlerThread(Socket socket, AuthenticationService authService, DeviceManager deviceMgr) {
+        ServerThread(Socket socket, AuthenticationService authService, DeviceManager deviceMgr) {
             this.clientSocket = socket;
             this.authenticationService = authService;
             this.deviceManager = deviceMgr;

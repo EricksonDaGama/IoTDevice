@@ -3,23 +3,45 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.Scanner;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 public class IoTDevice {
     private static String userid; //"Rodrigo"; // "Barata" //"Erickson"
+    private static String truststore;
+    private static String keystore;
+    private static String keystorePw;
     private static String devid;
     private static  String host;  //"localhost";
-    private static final int PORT = 23456;
+    private static final int PORT = 12345;
+
+    private static KeyStore trustStore;
+    private static KeyStore keyStore;
+    private static PrivateKey privateKey;
+
     public static void main(String[] args) {
         // Check arguments
-        if (args.length < 3) {
+        if (args.length != 6) {
             System.out.println(
-                    "Error: not enough args!\nUsage: IoTDevice <serverAddress> <dev-id> <user-id>\n");
+                    "Error: Invalid args!\nUsage: IoTDevice <serverAddress> <truststore> <keystore> <passwordkeystore> <dev-id> <user-id>\n");
             System.exit(1);
         }
+
         host = args[0];
-        devid = args[1];
-        userid = args[2];
+        truststore = args[1];
+        keystore = args[2];
+        keystorePw = args[3];
+        devid = args[4];
+        userid = args[5];
 
         if(!devid.chars().allMatch(Character::isDigit)) {
             System.out.println(
@@ -27,15 +49,47 @@ public class IoTDevice {
             System.exit(1);
         }
 
+        System.setProperty("javax.net.ssl.trustStore", truststore);
+        System.setProperty("javax.net.ssl.trustStorePassword", "ampgeg");
+        System.setProperty("javax.net.ssl.trustStoreType", "JCEKS");
+        System.setProperty("javax.net.ssl.keyStore", keystore);
+        System.setProperty("javax.net.ssl.keyStorePassword", keystorePw);
+        System.setProperty("javax.net.ssl.keyStoreType", "JCEKS");
+
+        FileInputStream tfile;
+        try {
+            tfile = new FileInputStream(truststore);
+       
+		KeyStore tstore = KeyStore.getInstance(KeyStore.getDefaultType());
+		tstore.load(tfile, "password".toCharArray());
+
+		KeyStore kstore = KeyStore.getInstance(KeyStore.getDefaultType()); // keystore
+		kstore.load(new FileInputStream(keystore), keystorePw.toCharArray());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         new IoTDevice().iniciarCliente();
     }
     public void iniciarCliente() {
         System.out.println("user-id: " + userid);
         System.out.println("device-id: " + devid);
-        try (Socket socket = new Socket(host, PORT);
-             ObjectOutputStream outStream = new ObjectOutputStream(socket.getOutputStream());
-             ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
-             Scanner scanner = new Scanner(System.in)) {
+        try  {
+
+            SocketFactory sf = SSLSocketFactory.getDefault();
+            SSLSocket soc = (SSLSocket) sf.createSocket(host, 12345);
+
+            ObjectOutputStream outStream = new ObjectOutputStream(soc.getOutputStream());
+            ObjectInputStream inStream = new ObjectInputStream(soc.getInputStream());
+            Scanner scanner = new Scanner(System.in);
             //1autenticar usuario
             boolean autenticado = false;
             while (!autenticado) {
