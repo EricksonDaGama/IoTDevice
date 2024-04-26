@@ -1,20 +1,19 @@
 package src.iotserver;
 
-import src.iohelper.Utils;
-
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class DeviceStorage {
+public class DeviceManager {
     private Map<String, Device> devices;
     private File devicesFile;
     private Lock wLock;
     private Lock rLock;
 
-    public DeviceStorage(String deviceFilePath) {
+    public DeviceManager(String deviceFilePath) {
         devices = new HashMap<>();
         devicesFile = new File(deviceFilePath);
 
@@ -39,48 +38,53 @@ public class DeviceStorage {
     public void addDevice(String userID, String devID) {
         Device device = new Device(userID, devID);
         device.goOnline();
-        devices.put(Utils.fullID(userID, devID), device);
+        devices.put(fullID(userID, devID), device);
         updateDevicesFile();
     }
 
+    public static String fullID(String userId, String devId){
+        return (userId + ":" + devId);
+    }
+
+
     public void addDomainToDevice(String userID, String devID,
             String domainName) {
-        devices.get(Utils.fullID(userID, devID)).registerInDomain(domainName);
+        devices.get(fullID(userID, devID)).registerInDomain(domainName);
         updateDevicesFile();
     }
 
     public void saveDeviceImage(String userID, String devID, String imgPath) {
-        devices.get(Utils.fullID(userID, devID)).registerImage(imgPath);
+        devices.get(fullID(userID, devID)).registerImage(imgPath);
         updateDevicesFile();
     }
 
     public String getDeviceImage(String userID, String devID) {
-        return devices.get(Utils.fullID(userID, devID)).getImagePath();
+        return devices.get(fullID(userID, devID)).getImagePath();
     }
 
     public void saveDeviceTemperature(String userID, String devID, float temp) {
-        devices.get(Utils.fullID(userID, devID)).registerTemperature(temp);
+        devices.get(fullID(userID, devID)).registerTemperature(temp);
         updateDevicesFile();
     }
 
     public float getDeviceTemperature(String userID, String devID) {
-        return devices.get(Utils.fullID(userID, devID)).getTemperature();
+        return devices.get(fullID(userID, devID)).getTemperature();
     }
 
     public boolean deviceExists(String userID, String devID) {
-        return devices.containsKey(Utils.fullID(userID, devID));
+        return devices.containsKey(fullID(userID, devID));
     }
 
     public boolean isDeviceOnline(String userID, String devID) {
-        return devices.get(Utils.fullID(userID, devID)).isOnline();
+        return devices.get(fullID(userID, devID)).isOnline();
     }
 
     public void activateDevice(String userID, String devID) {
-        devices.get(Utils.fullID(userID, devID)).goOnline();
+        devices.get(fullID(userID, devID)).goOnline();
     }
 
     public void deactivateDevice(String userID, String devID) {
-        devices.get(Utils.fullID(userID, devID)).goOffline();
+        devices.get(fullID(userID, devID)).goOffline();
     }
 
     public void readLock() {
@@ -121,7 +125,7 @@ public class DeviceStorage {
         reader.close();
 
         for (int i = 0; i < lines.length; i++) {
-            String[] tokens = Utils.split(lines[i], SP);
+            String[] tokens = split(lines[i], SP);
             String uid = tokens[0];
             String did = tokens[1];
             Float temperature = null;
@@ -132,7 +136,27 @@ public class DeviceStorage {
             if(temperature != null){device.registerTemperature(temperature);}
             if(imagePath!=null) device.registerImage(imagePath);
 
-            devices.put(Utils.fullID(uid, did), device);
+            devices.put(fullID(uid, did), device);
         }
+    }
+
+
+
+    static public String[] split(String str, char sep) {
+        int occurrences = 1;
+        ArrayList<String> blocks = new ArrayList<>();
+
+        int i = 0;
+        int j = str.indexOf(sep) != -1 ? str.indexOf(sep) : str.length();
+        blocks.add(str.substring(i, j).trim());
+
+        while (j != str.length()) {
+            i = j + 1;
+            j = str.indexOf(sep, i) != -1 ? str.indexOf(sep, i) : str.length();
+            blocks.add(str.substring(i, j).trim());
+            occurrences++;
+        }
+
+        return blocks.toArray(new String[occurrences]);
     }
 }

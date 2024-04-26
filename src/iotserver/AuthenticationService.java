@@ -1,7 +1,5 @@
 package src.iotserver;
 
-import src.iohelper.Utils;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -14,27 +12,27 @@ import java.security.cert.CertificateFactory;
 import java.util.Base64;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ServerAuth {
-    private static volatile ServerAuth INSTANCE;
+public class AuthenticationService {
+    private static volatile AuthenticationService INSTANCE;
 
     private static final String USER_FILEPATH = "user.txt";
     private static String apiKey;
 
     private UserStorage userStorage;
 
-    public static ServerAuth getInstance() {
-        ServerAuth instance = INSTANCE;
+    public static AuthenticationService getInstance() {
+        AuthenticationService instance = INSTANCE;
         if (instance != null)
             return instance;
 
-        synchronized (ServerAuth.class) {
+        synchronized (AuthenticationService.class) {
             if (instance == null)
-                instance = new ServerAuth();
+                instance = new AuthenticationService();
             return instance;
         }
     }
 
-    private ServerAuth() {
+    private AuthenticationService() {
         userStorage = new UserStorage(USER_FILEPATH);
     }
 
@@ -102,7 +100,7 @@ public class ServerAuth {
             NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("MD5withRSA");
         Certificate cert = null;
-        try (InputStream in = new FileInputStream(Utils.certPathFromUser(user))) {
+        try (InputStream in = new FileInputStream(certPathFromUser(user))) {
             cert = CertificateFactory.getInstance("X509")
                     .generateCertificate(in);
         }
@@ -111,11 +109,15 @@ public class ServerAuth {
         signature.update(ByteBuffer.allocate(Long.BYTES).putLong(nonce).array());
         return signature.verify(signedNonce);
     }
+    public static String certPathFromUser(String user) {
+        return "output/server/certificado/" + user + ".cert";
+    }
+
 
     public void saveCertificateInFile(String user, Certificate cert) {
         try {
-            Utils.initializeFile(Utils.certPathFromUser(user));
-            FileOutputStream os = new FileOutputStream(Utils.certPathFromUser(user));
+            initializeFile(certPathFromUser(user));
+            FileOutputStream os = new FileOutputStream(certPathFromUser(user));
             os.write("-----BEGIN CERTIFICATE-----\n".getBytes("US-ASCII"));
             os.write(Base64.getEncoder().encode(cert.getEncoded()));
             os.write("-----END CERTIFICATE-----\n".getBytes("US-ASCII"));
@@ -129,6 +131,15 @@ public class ServerAuth {
         }
     }
 
+    public static File initializeFile(String filename) throws IOException {
+        File fileCreated = new File(filename);
+        if (!fileCreated.exists()) {
+            fileCreated.createNewFile();
+            System.out.println("File created: " + fileCreated.getName());
+        }
+        return fileCreated;
+    }
+
     public boolean verifySignedNonce(byte[] signedNonce, Certificate cert, long nonce)
             throws SignatureException, NoSuchAlgorithmException, InvalidKeyException {
         Signature signature = Signature.getInstance("MD5withRSA");
@@ -140,7 +151,7 @@ public class ServerAuth {
     public static boolean verifyAttestationHash(byte[] hash, long nonce)
             throws IOException, NoSuchAlgorithmException {
         final int CHUNK_SIZE = 1024;
-        String clientExecPath = Utils.getAttestationPath();
+        String clientExecPath = getAttestationPath();
         long clientExecSize = new File(clientExecPath).length();
         FileInputStream clientExecInStream = new FileInputStream(clientExecPath);
         MessageDigest md = MessageDigest.getInstance("SHA");
@@ -152,11 +163,23 @@ public class ServerAuth {
         }
         md.update(clientExecInStream.readNBytes(Long.valueOf(leftToRead)
                 .intValue()));
-        md.update(Utils.longToByteArray(nonce));
+        md.update(longToByteArray(nonce));
 
         clientExecInStream.close();
 
         byte[] computedHash = md.digest();
         return MessageDigest.isEqual(hash, computedHash);
     }
+
+
+    public static String getAttestationPath() throws IOException{
+        BufferedReader br = new BufferedReader(new FileReader("atestacaoRemota.txt"));
+        String path = br.readLine();
+        return path;
+    }
+
+    public static byte[] longToByteArray(long l) {
+        return ByteBuffer.allocate(Long.BYTES).putLong(l).array();
+    }
+
 }

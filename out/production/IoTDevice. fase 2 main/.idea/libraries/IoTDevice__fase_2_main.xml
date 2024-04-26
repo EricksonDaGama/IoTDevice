@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="IoTDevice. fase 2 main">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/IoTDevice.jar!/" />
+      <root url="jar://$PROJECT_DIR$/IoTServer.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

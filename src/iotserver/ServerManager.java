@@ -1,22 +1,13 @@
 package src.iotserver;
-import  src.iohelper.FileHelper;
-import src.iohelper.Utils;
 import src.iotclient.MessageCode;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class ServerManager {
     private static volatile ServerManager instance;
 
-    private DomainStorage domStorage;
-    private DeviceStorage devStorage;
+    private DomainManager domStorage;
+    private DeviceManager devStorage;
     private UserStorage userStorage;
 
     private static final String baseDir = "./output/server/";
@@ -28,8 +19,8 @@ public class ServerManager {
     private static final String temperatureDirectoryPath = baseDir + "temp/";
 
     private ServerManager(){
-        domStorage = new DomainStorage(domainFilePath);
-        devStorage = new DeviceStorage(deviceFilePath);
+        domStorage = new DomainManager(domainFilePath);
+        devStorage = new DeviceManager(deviceFilePath);
         userStorage = new UserStorage(userFilePath);
 
         new File(imageDirectoryPath).mkdirs();
@@ -252,7 +243,7 @@ public class ServerManager {
         devStorage.writeLock();
         try {
             if (devStorage.deviceExists(userId, devId)) {
-                System.out.println("devid:" + Utils.fullID(userId, devId));
+                System.out.println("devid:" + fullID(userId, devId));
 
                 if (devStorage.isDeviceOnline(userId, devId)) {
                     System.out.println("dev is online");
@@ -270,12 +261,17 @@ public class ServerManager {
         }
     }
 
-   /** public ServerResponse attestClient(String devFileName, long devFileSize)
-            throws IOException {
-        if (devFileName.equals(clientFileName) && devFileSize==clientFileSize) {
-            return new ServerResponse(MessageCode.OK_TESTED);
-        }
+    public static String fullID(String userId, String devId){
+        return (userId + ":" + devId);
+    }
 
-        return new ServerResponse(MessageCode.NOK_TESTED);
-    }*/
+
+    /** public ServerResponse attestClient(String devFileName, long devFileSize)
+             throws IOException {
+         if (devFileName.equals(clientFileName) && devFileSize==clientFileSize) {
+             return new ServerResponse(MessageCode.OK_TESTED);
+         }
+
+         return new ServerResponse(MessageCode.NOK_TESTED);
+     }*/
 }

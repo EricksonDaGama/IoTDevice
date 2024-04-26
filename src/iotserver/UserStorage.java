@@ -1,8 +1,7 @@
 package src.iotserver;
 
-import src.iohelper.Utils;
-
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -88,10 +87,29 @@ public class UserStorage {
         reader.close();
 
         for (String line: lines) {
-            String[] tokens  = Utils.split(line, ':');
+            String[] tokens  = split(line, ':');
             String user = tokens[0];
             String certPath = tokens[1];
             registerUser(user, certPath);
         }
+    }
+
+
+    static public String[] split(String str, char sep) {
+        int occurrences = 1;
+        ArrayList<String> blocks = new ArrayList<>();
+
+        int i = 0;
+        int j = str.indexOf(sep) != -1 ? str.indexOf(sep) : str.length();
+        blocks.add(str.substring(i, j).trim());
+
+        while (j != str.length()) {
+            i = j + 1;
+            j = str.indexOf(sep, i) != -1 ? str.indexOf(sep, i) : str.length();
+            blocks.add(str.substring(i, j).trim());
+            occurrences++;
+        }
+
+        return blocks.toArray(new String[occurrences]);
     }
 }

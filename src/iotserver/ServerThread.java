@@ -1,9 +1,7 @@
 package src.iotserver;
 
-import src.iohelper.FileHelper;
-import src.iohelper.Utils;
 import src.iotclient.MessageCode;
-import src.iotserver.DomainStorage;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -16,7 +14,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ServerThread extends Thread {
     private static final String IMAGE_DIR_PATH = "./output/server/img/";
@@ -113,7 +110,7 @@ public class ServerThread extends Thread {
             InvalidKeyException, CertificateException, NoSuchAlgorithmException,
             SignatureException {
         System.out.println("Starting user auth.");
-        ServerAuth sa = IoTServer.SERVER_AUTH;
+        AuthenticationService sa = IoTServer.SERVER_AUTH;
         userID = (String) in.readObject();
 
         long nonce = sa.generateNonce();
@@ -155,12 +152,12 @@ public class ServerThread extends Thread {
 
     private void attestClient() throws ClassNotFoundException, IOException,
             NoSuchAlgorithmException {
-        long nonce = ServerAuth.generateNonce();
+        long nonce = AuthenticationService.generateNonce();
         out.writeLong(nonce);
         out.flush();
 
         byte[] receivedHash = (byte[]) in.readObject();
-        if (ServerAuth.verifyAttestationHash(receivedHash, nonce)) {
+        if (AuthenticationService.verifyAttestationHash(receivedHash, nonce)) {
             out.writeObject(MessageCode.OK_TESTED);
         } else {
             manager.disconnectDevice(userID, deviceID);
@@ -210,13 +207,46 @@ public class ServerThread extends Thread {
         long fileSize = (long) in.readObject();
         String fullImgPath = IMAGE_DIR_PATH + filename;
 
-        FileHelper.receiveFile(fileSize, fullImgPath, in);
+        receiveFile(fileSize, fullImgPath, in);
 
         MessageCode res = manager
                 .registerImage(filename, this.userID, this.deviceID)
                 .responseCode();
         out.writeObject(res);
     }
+
+
+
+
+    public static void receiveFile(Long fileSize, String path, ObjectInputStream in) {
+        try {
+            File f = new File(path);
+            f.createNewFile();
+
+            FileOutputStream fout = new FileOutputStream(f);
+            OutputStream output = new BufferedOutputStream(fout);
+
+            int bytesWritten = 0;
+            byte[] buffer = new byte[1024];
+
+            while (fileSize > bytesWritten) {
+                int bytesRead = in.read(buffer, 0, 1024);
+                output.write(buffer, 0, bytesRead);
+                output.flush();
+                fout.flush();
+                bytesWritten += bytesRead;
+                System.out.println(bytesWritten);
+            }
+            output.close();
+            fout.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+
+
 
     private void getTemperatures() throws IOException, ClassNotFoundException {
         String domain = (String) in.readObject();
@@ -257,7 +287,7 @@ public class ServerThread extends Thread {
                 if (parts.length >= 4) {
                     String deviceId = parts[1].trim();
                     String temperature = parts[2].trim();
-                    DomainStorage domStorage = new DomainStorage("output/server/domain.txt");
+                    DomainManager domStorage = new DomainManager("output/server/domain.txt");
                     if (domStorage.isUserRegisteredInDomain(parts[0], domain)) {
                         data.add("Device ID: " + deviceId + " - Temperature: " + temperature);
                     }
@@ -298,14 +328,42 @@ public class ServerThread extends Thread {
         out.writeObject(rCode);
         // Send file (if aplicable)
         if (rCode == MessageCode.OK) {
-            FileHelper.sendFile(sr.filePath(), out);
+            sendFile(sr.filePath(), out);
+        }
+    }
+
+    public static void sendFile(String path,ObjectOutputStream out) {
+        File f = new File(path);
+        long fileSize = f.length();
+        try {
+            // Send file name
+            out.writeObject(f.getName());
+            // Send file size
+            out.writeObject(fileSize);
+
+            FileInputStream fin = new FileInputStream(f);
+            InputStream input = new BufferedInputStream(fin);
+            // Send file
+            int bytesSent = 0;
+            byte[] buffer = new byte[1024];
+            while (fileSize > bytesSent) {
+                int bytesRead = input.read(buffer, 0, 1024);
+                bytesSent += bytesRead;
+                out.write(buffer, 0, bytesRead);
+                out.flush();
+            }
+            input.close();
+            fin.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
     private void authUnregisteredUser(long nonce) throws IOException,
             ClassNotFoundException, InvalidKeyException, CertificateException,
             NoSuchAlgorithmException, SignatureException {
-        ServerAuth sa = IoTServer.SERVER_AUTH;
+        AuthenticationService sa = IoTServer.SERVER_AUTH;
 
         long receivedUnsignedNonce = in.readLong();
         byte[] signedNonce = (byte[]) in.readObject();
@@ -313,18 +371,22 @@ public class ServerThread extends Thread {
 
         if (sa.verifySignedNonce(signedNonce, cert, nonce) &&
                 receivedUnsignedNonce == nonce) {
-            sa.registerUser(userID, Utils.certPathFromUser(userID));
+            sa.registerUser(userID, certPathFromUser(userID));
             sa.saveCertificateInFile(userID, cert);
             out.writeObject(MessageCode.OK);
         } else {
             out.writeObject(MessageCode.WRONG_NONCE);
         }
     }
+    public static String certPathFromUser(String user) {
+        return "output/server/certificado/" + user + ".cert";
+    }
+
 
     private void authRegisteredUser(long nonce) throws ClassNotFoundException,
             IOException, InvalidKeyException, CertificateException,
             NoSuchAlgorithmException, SignatureException {
-        ServerAuth sa = IoTServer.SERVER_AUTH;
+        AuthenticationService sa = IoTServer.SERVER_AUTH;
 
         byte[] signedNonce = (byte[]) in.readObject();
         if (sa.verifySignedNonce(signedNonce, userID, nonce)) {

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="59e2b200-69f0-4135-9060-4f31dbf9b53b" name="Changes" comment="" />
+    <list default="true" id="fa2761c7-da97-4ddc-83a5-f17e858eccc9" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,22 +13,26 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 3
 }]]></component>
-  <component name="ProjectId" id="2fbaSzBqyulDkMlkToWfGuP4TsQ" />
+  <component name="ProjectId" id="2fe4grJM5yYWyyqqTlWSNlnv2eS" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.IoTDevice.executor": "Run",
     "Application.IoTServer.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "fase2",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/IoTDevice. fase 2 main/output/user3",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -38,19 +42,32 @@
   }
 }]]></component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/output/user3" />
-      <recent name="$PROJECT_DIR$/output/user2" />
-      <recent name="$PROJECT_DIR$/src" />
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="src.iohelper" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration name="IoTServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="src.server.IoTServer" />
+  <component name="RunManager" selected="Application.IoTDevice">
+    <configuration name="IoTDevice" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="src.iotclient.IoTDevice" />
       <module name="IoTDevice. fase 2 main" />
+      <option name="PROGRAM_PARAMETERS" value="localhost:12345 output/truststore.jceks output/user1/user1.jceks ampgeg 1 fc53653@alunos.fc.ul.pt" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="src.server.*" />
+          <option name="PATTERN" value="src.iotclient.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IoTServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="src.iotserver.IoTServer" />
+      <module name="IoTDevice. fase 2 main" />
+      <option name="PROGRAM_PARAMETERS" value="12345 ampgeg output/server/server.keystore ampgeg 4RnyBuSaK2JhTV7fdwu1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="src.iotserver.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -74,12 +91,12 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="59e2b200-69f0-4135-9060-4f31dbf9b53b" name="Changes" comment="" />
-      <created>1714072234953</created>
+      <changelist id="fa2761c7-da97-4ddc-83a5-f17e858eccc9" name="Changes" comment="" />
+      <created>1714148325492</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1714072234953</updated>
-      <workItem from="1714072235996" duration="11108000" />
+      <updated>1714148325492</updated>
+      <workItem from="1714148326735" duration="3353000" />
     </task>
     <servers />
   </component>
