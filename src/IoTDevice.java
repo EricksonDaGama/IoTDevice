@@ -55,7 +55,7 @@ public class IoTDevice {
         }
 
         System.setProperty("javax.net.ssl.trustStore", truststore);
-        System.setProperty("javax.net.ssl.trustStorePassword", "ampgeg");
+        System.setProperty("javax.net.ssl.trustStorePassword", "");
         System.setProperty("javax.net.ssl.trustStoreType", "JCEKS");
         System.setProperty("javax.net.ssl.keyStore", keystore);
         System.setProperty("javax.net.ssl.keyStorePassword", keystorePw);
@@ -66,9 +66,9 @@ public class IoTDevice {
             tfile = new FileInputStream(truststore);
        
             KeyStore tstore = KeyStore.getInstance(KeyStore.getDefaultType());
-            tstore.load(tfile, "password".toCharArray());
+            tstore.load(tfile, "ampgeg".toCharArray());
 
-            KeyStore kstore = KeyStore.getInstance(KeyStore.getDefaultType()); // keystore
+            KeyStore kstore = KeyStore.getInstance(KeyStore.getDefaultType()); 
             kstore.load(new FileInputStream(keystore), keystorePw.toCharArray());
 
             SocketFactory ssf = SSLSocketFactory.getDefault();

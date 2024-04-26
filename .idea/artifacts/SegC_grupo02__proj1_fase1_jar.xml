@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="Server:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/Server_jar</output-path>
+  <artifact type="jar" name="SegC-grupo02- proj1-fase1:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SegC_grupo02__proj1_fase1_jar</output-path>
     <root id="archive" name="SegC-grupo02- proj1-fase1.jar">
       <element id="module-output" name="SegC-grupo02- proj1-fase1" />
     </root>

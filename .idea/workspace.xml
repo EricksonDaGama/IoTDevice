@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="Cliente:jar" />
+      <artifact name="SegC-grupo02- proj1-fase1:jar" />
     </artifacts-to-build>
   </component>
   <component name="AutoImportSettings">
@@ -10,9 +10,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="59e2f19e-a56c-43a1-ad01-ef5f596df3a1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/Cliente_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/SegC_grupo02__proj1_fase1_jar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/Server_jar.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IoTDevice.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IoTServer.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SegC-grupo02- proj1-fase1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/SegC-grupo02- proj1-fase1.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/IoTDevice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IoTDevice.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/IoTServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IoTServer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,41 +42,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.IoTDevice.executor&quot;: &quot;Run&quot;,
-    &quot;Application.IoTServer (1).executor&quot;: &quot;Run&quot;,
-    &quot;Application.IoTServer.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.Cliente.jar (1).executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.Cliente.jar.executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.IoTDevice.jar (1).executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.IoTDevice.jar.executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.IoTServer.jar (1).executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.IoTServer.jar.executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.SegC-grupo02- proj1-fase1.jar (1).executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.SegC-grupo02- proj1-fase1.jar.executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.Server.jar (1).executor&quot;: &quot;Run&quot;,
-    &quot;JAR Application.Server.jar.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;finalizar/testar&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src/Main.java&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.IoTDevice.executor": "Run",
+    "Application.IoTServer (1).executor": "Run",
+    "Application.IoTServer.executor": "Run",
+    "Application.Main.executor": "Run",
+    "JAR Application.Cliente.jar (1).executor": "Run",
+    "JAR Application.Cliente.jar.executor": "Run",
+    "JAR Application.IoTDevice.jar (1).executor": "Run",
+    "JAR Application.IoTDevice.jar.executor": "Run",
+    "JAR Application.IoTServer.jar (1).executor": "Run",
+    "JAR Application.IoTServer.jar.executor": "Run",
+    "JAR Application.SegC-grupo02- proj1-fase1.jar (1).executor": "Run",
+    "JAR Application.SegC-grupo02- proj1-fase1.jar.executor": "Run",
+    "JAR Application.Server.jar (1).executor": "Run",
+    "JAR Application.Server.jar.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "fase2-original",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/rodrigo/Documents/GitHub/IoTDevice",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src/Main.java",
+    "project.structure.last.edited": "Artifacts",
+    "project.structure.proportion": "0.15234375",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "settings.sync",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -134,7 +138,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176" />
+        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
       </set>
     </attachedChunks>
   </component>
@@ -160,6 +165,7 @@
       <workItem from="1711356317572" duration="1031000" />
       <workItem from="1711412578804" duration="28289000" />
       <workItem from="1711556071646" duration="6416000" />
+      <workItem from="1714162834979" duration="2388000" />
     </task>
     <servers />
   </component>
