@@ -1,6 +1,5 @@
 package src.iotserver;
-import  src.iohelper.FileHelper;
-import src.iohelper.Utils;
+
 import src.iotclient.MessageCode;
 
 import java.io.*;
@@ -252,7 +251,7 @@ public class ServerManager {
         devStorage.writeLock();
         try {
             if (devStorage.deviceExists(userId, devId)) {
-                System.out.println("devid:" + Utils.fullID(userId, devId));
+                System.out.println("devid:" + userId + ":" + devId);
 
                 if (devStorage.isDeviceOnline(userId, devId)) {
                     System.out.println("dev is online");
@@ -269,13 +268,4 @@ public class ServerManager {
             devStorage.writeUnlock();
         }
     }
-
-   /** public ServerResponse attestClient(String devFileName, long devFileSize)
-            throws IOException {
-        if (devFileName.equals(clientFileName) && devFileSize==clientFileSize) {
-            return new ServerResponse(MessageCode.OK_TESTED);
-        }
-
-        return new ServerResponse(MessageCode.NOK_TESTED);
-    }*/
 }

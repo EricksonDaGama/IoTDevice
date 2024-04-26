@@ -1,7 +1,5 @@
 package src.iotserver;
 
-import src.iohelper.Utils;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +51,7 @@ public class DomainCatalog {
     public boolean addDeviceToDomain(String userID, String devID,
             String domainName) {
         Domain domain = domains.get(domainName);
-        boolean ret = domain.registerDevice(Utils.fullID(userID, devID));
+        boolean ret = domain.registerDevice(userID + ":" + devID);
         if (ret) updateDomainsFile();
         return ret;
     }
@@ -67,12 +65,12 @@ public class DomainCatalog {
         Domain domain = domains.get(domainName);
         Map<String, Float> temperatures = new HashMap<>();
 
-        for (String fullDevID : domain.getDevices()) {
-            String userID = Utils.userIDFromFullID(fullDevID);
-            String devID = Utils.devIDFromFullID(fullDevID);
-            float devTemperature =
+        for (String fullID : domain.getDevices()) {
+            String userID = fullID.split(":")[0];
+            String devID = fullID.split(":")[1];
+            float temp =
                 devStorage.getDeviceTemperature(userID, devID);
-            temperatures.put(fullDevID, devTemperature);
+            temperatures.put(fullID, temp);
         }
         return temperatures;
     }
@@ -94,7 +92,7 @@ public class DomainCatalog {
     public boolean isDeviceRegisteredInDomain(String userID, String devID,
             String domainName) {
         Domain domain = domains.get(domainName);
-        return domain.isDeviceRegistered(Utils.fullID(userID, devID));
+        return domain.isDeviceRegistered(userID + ":" + devID);
     }
 
     public void readLock() {
@@ -113,9 +111,9 @@ public class DomainCatalog {
         wLock.unlock();
     }
 
-    public boolean hasAccessToDevice(String user, String devUID, String devDID) {
+    public boolean hasAccessToDevice(String user, String userID, String devID) {
         boolean hasAccess = false;
-        String fullID = Utils.fullID(devUID, devDID);
+        String fullID = userID + ":" + devID;
 
         for (Domain domain : domains.values()) {
             if (!domain.isDeviceRegistered(fullID)) continue;
@@ -125,7 +123,7 @@ public class DomainCatalog {
             }
         }
 
-        return user.equals(devUID) || hasAccess;
+        return user.equals(userID) || hasAccess;
     }
 
     private void updateDomainsFile(){
@@ -154,17 +152,17 @@ public class DomainCatalog {
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             boolean isDomainLine = line.charAt(0) != TAB;
-            String[] tokens = Utils.split(line, SP);
+            String[] tokens = line.split(":");
 
             if (isDomainLine) {
                 currentDomainName = tokens[0];
                 initDomainFromLine(tokens);
             } else {
-                String devUID = tokens[0];
-                String devDID = tokens[1];
+                String userID = tokens[0];
+                String devID = tokens[1];
                 domains
                     .get(currentDomainName)
-                    .registerDevice(Utils.fullID(devUID, devDID));
+                    .registerDevice(userID + ":" + devID);
             }
         }
     }

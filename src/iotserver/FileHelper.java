@@ -1,21 +1,9 @@
-package src.iohelper;
+package src.iotserver;
 
 import java.io.*;
 
 public class FileHelper {
-    // private ObjectOutputStream out;
-    // private ObjectInputStream in;
 
-    // public Iohelper(ObjectOutputStream out, ObjectInputStream in){
-    //     this.out = out;
-    //     this.in = in;
-    // }
-
-    /**
-     * Sends a file to the server.
-     * 
-     * @param path File path
-     */
     public static void sendFile(String path,ObjectOutputStream out) {
         File f = new File(path);
         long fileSize = f.length();
@@ -39,17 +27,10 @@ public class FileHelper {
             input.close();
             fin.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-  /**
-     * Receive's a file from the server.
-     * 
-     * @param fileSize File size.
-     * @param path File path
-     */
     public static void receiveFile(Long fileSize, String path, ObjectInputStream in) {
         try {
             File f = new File(path);
@@ -72,7 +53,6 @@ public class FileHelper {
             output.close();
             fout.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

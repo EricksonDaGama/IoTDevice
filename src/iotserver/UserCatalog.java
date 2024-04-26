@@ -1,7 +1,5 @@
 package src.iotserver;
 
-import src.iohelper.Utils;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,7 +86,7 @@ public class UserCatalog {
         reader.close();
 
         for (String line: lines) {
-            String[] tokens  = Utils.split(line, ':');
+            String[] tokens  = line.split(":");
             String user = tokens[0];
             String certPath = tokens[1];
             registerUser(user, certPath);

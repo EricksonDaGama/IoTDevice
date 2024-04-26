@@ -1,6 +1,5 @@
 package src.iotserver;
 
-import src.iohelper.Utils;
 
 import java.io.*;
 import java.util.HashMap;
@@ -39,48 +38,48 @@ public class DeviceCatalog {
     public void addDevice(String userID, String devID) {
         Device device = new Device(userID, devID);
         device.goOnline();
-        devices.put(Utils.fullID(userID, devID), device);
+        devices.put(userID + ":" + devID, device);
         updateDevicesFile();
     }
 
     public void addDomainToDevice(String userID, String devID,
             String domainName) {
-        devices.get(Utils.fullID(userID, devID)).registerInDomain(domainName);
+        devices.get(userID + ":" + devID).registerInDomain(domainName);
         updateDevicesFile();
     }
 
     public void saveDeviceImage(String userID, String devID, String imgPath) {
-        devices.get(Utils.fullID(userID, devID)).registerImage(imgPath);
+        devices.get(userID + ":" + devID).registerImage(imgPath);
         updateDevicesFile();
     }
 
     public String getDeviceImage(String userID, String devID) {
-        return devices.get(Utils.fullID(userID, devID)).getImagePath();
+        return devices.get(userID + ":" + devID).getImagePath();
     }
 
     public void saveDeviceTemperature(String userID, String devID, float temp) {
-        devices.get(Utils.fullID(userID, devID)).registerTemperature(temp);
+        devices.get(userID + ":" + devID).registerTemperature(temp);
         updateDevicesFile();
     }
 
     public float getDeviceTemperature(String userID, String devID) {
-        return devices.get(Utils.fullID(userID, devID)).getTemperature();
+        return devices.get(userID + ":" + devID).getTemperature();
     }
 
     public boolean deviceExists(String userID, String devID) {
-        return devices.containsKey(Utils.fullID(userID, devID));
+        return devices.containsKey(userID + ":" + devID);
     }
 
     public boolean isDeviceOnline(String userID, String devID) {
-        return devices.get(Utils.fullID(userID, devID)).isOnline();
+        return devices.get(userID + ":" + devID).isOnline();
     }
 
     public void activateDevice(String userID, String devID) {
-        devices.get(Utils.fullID(userID, devID)).goOnline();
+        devices.get(userID + ":" + devID).goOnline();
     }
 
     public void deactivateDevice(String userID, String devID) {
-        devices.get(Utils.fullID(userID, devID)).goOffline();
+        devices.get(userID + ":" + devID).goOffline();
     }
 
     public void readLock() {
@@ -114,17 +113,16 @@ public class DeviceCatalog {
     }
 
     private void populateDevicesFromFile() throws IOException {
-        final char SP = ':';
 
         BufferedReader reader = new BufferedReader(new FileReader(devicesFile));
         String[] lines = (String[]) reader.lines().toArray(String[]::new);
         reader.close();
 
         for (int i = 0; i < lines.length; i++) {
-            String[] tokens = Utils.split(lines[i], SP);
+            String[] tokens = lines[i].split(":");
             String uid = tokens[0];
             String did = tokens[1];
-            Float temperature = null;
+            Float temperature = (float) 0;
             if(!tokens[2].equals("")){temperature = Float.parseFloat(tokens[2]);}
             String imagePath = tokens[3];;
 
@@ -132,7 +130,7 @@ public class DeviceCatalog {
             if(temperature != null){device.registerTemperature(temperature);}
             if(imagePath!=null) device.registerImage(imagePath);
 
-            devices.put(Utils.fullID(uid, did), device);
+            devices.put(uid + ":" + did, device);
         }
     }
 }

@@ -1,7 +1,5 @@
 package src.iotclient;
-
-import src.iohelper.FileHelper;
-import src.iohelper.Utils;
+import src.iotserver.FileHelper;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -131,32 +129,29 @@ public class IoTDevice {
     private static void sendAttestationHash(long nonce) {
         try {
             final int CHUNK_SIZE = 1024;
-            String clientExecPath = Utils.getAttestationPath();
-            long clientExecSize = new File(clientExecPath).length();
-            FileInputStream clientFIS;
-            clientFIS = new FileInputStream(clientExecPath);
+            BufferedReader br = new BufferedReader(new FileReader("atestacaoRemota.txt"));
+            String path = br.readLine();
+            long execSize = new File(path).length();
+            FileInputStream fis;
+            fis = new FileInputStream(path);
             MessageDigest md = MessageDigest.getInstance("SHA");
 
-            long leftToRead = clientExecSize;
+            long leftToRead = execSize;
             while (leftToRead >= CHUNK_SIZE) {
-                md.update(clientFIS.readNBytes(CHUNK_SIZE)); // MessageDigest.update *appends* the byte array provided
+                md.update(fis.readNBytes(CHUNK_SIZE)); // MessageDigest.update *appends* the byte array provided
                 leftToRead -= CHUNK_SIZE;
             }
-
-            md.update(clientFIS.readNBytes(Long.valueOf(leftToRead).intValue()));
+            md.update(fis.readNBytes(Long.valueOf(leftToRead).intValue()));
             md.update(ByteBuffer.allocate(8).putLong(nonce).array());
-            clientFIS.close();
+            fis.close();
             byte[] attestationHash = md.digest();
             out.writeObject(attestationHash);
 
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

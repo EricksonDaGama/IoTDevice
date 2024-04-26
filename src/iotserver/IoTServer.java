@@ -4,8 +4,6 @@ import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
-import src.iohelper.FileHelper;
-import src.iohelper.Utils;
 import src.iotclient.MessageCode;
 
 import java.io.BufferedReader;
@@ -387,7 +385,7 @@ public class IoTServer {
 
             if (sa.verifySignedNonce(signedNonce, cert, nonce) &&
                     receivedUnsignedNonce == nonce) {
-                sa.registerUser(userID, Utils.certPathFromUser(userID));
+                sa.registerUser(userID, "output/server/certificado/" + userID + ".cert");
                 sa.saveCertificateInFile(userID, cert);
                 out.writeObject(MessageCode.OK);
             } else {

@@ -1,7 +1,5 @@
 package src.iotserver;
 
-import src.iohelper.Utils;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,6 +11,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Base64;
 import java.util.concurrent.ThreadLocalRandom;
+
 
 public class Authentication {
     private static volatile Authentication INSTANCE;
@@ -102,7 +101,7 @@ public class Authentication {
             NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("MD5withRSA");
         Certificate cert = null;
-        try (InputStream in = new FileInputStream(Utils.certPathFromUser(user))) {
+        try (InputStream in = new FileInputStream("output/server/certificado/" + user + ".cert")) {
             cert = CertificateFactory.getInstance("X509")
                     .generateCertificate(in);
         }
@@ -114,8 +113,7 @@ public class Authentication {
 
     public void saveCertificateInFile(String user, Certificate cert) {
         try {
-            Utils.initializeFile(Utils.certPathFromUser(user));
-            FileOutputStream os = new FileOutputStream(Utils.certPathFromUser(user));
+            FileOutputStream os = new FileOutputStream("output/server/certificado/" + user + ".cert");
             os.write("-----BEGIN CERTIFICATE-----\n".getBytes("US-ASCII"));
             os.write(Base64.getEncoder().encode(cert.getEncoded()));
             os.write("-----END CERTIFICATE-----\n".getBytes("US-ASCII"));
@@ -140,9 +138,11 @@ public class Authentication {
     public static boolean verifyAttestationHash(byte[] hash, long nonce)
             throws IOException, NoSuchAlgorithmException {
         final int CHUNK_SIZE = 1024;
-        String clientExecPath = Utils.getAttestationPath();
-        long clientExecSize = new File(clientExecPath).length();
-        FileInputStream clientExecInStream = new FileInputStream(clientExecPath);
+        BufferedReader br = new BufferedReader(new FileReader("atestacaoRemota.txt"));
+        String path = br.readLine();
+ 
+        long clientExecSize = new File(path).length();
+        FileInputStream clientExecInStream = new FileInputStream(path);
         MessageDigest md = MessageDigest.getInstance("SHA");
 
         long leftToRead = clientExecSize;
@@ -152,7 +152,7 @@ public class Authentication {
         }
         md.update(clientExecInStream.readNBytes(Long.valueOf(leftToRead)
                 .intValue()));
-        md.update(Utils.longToByteArray(nonce));
+        md.update(ByteBuffer.allocate(Long.BYTES).putLong(nonce).array());
 
         clientExecInStream.close();
 
