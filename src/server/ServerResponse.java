@@ -1,12 +1,12 @@
 package src.server;
 
-import src.others.CodeMessage;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Map;
+
+import src.client.CodeMessage;
 
 public class ServerResponse  {
     private CodeMessage code;

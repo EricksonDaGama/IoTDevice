@@ -132,7 +132,7 @@ public class DomainManager {
         String fullID = fullID(devUID, devDID);
 
         for (Domain domain : domains.values()) {
-            if (!domain.isDeviceRegistered(fullID)) continue;
+            //if (!domain.isDeviceRegistered(fullID)) continue;
             if (domain.isRegistered(user)) {
                 hasAccess = true;
                 break;

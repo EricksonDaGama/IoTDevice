@@ -1,4 +1,4 @@
-package src.others;
+package src.client;
 
 /**
  * Represents messages to be sent between server and client.

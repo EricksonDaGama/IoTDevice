@@ -1,0 +1,2 @@
+fc54416@alunos.fc.ul.pt:output/server/certificado/fc54416@alunos.fc.ul.pt.cert
+fc54483@alunos.fc.ul.pt:output/server/certificado/fc54483@alunos.fc.ul.pt.cert

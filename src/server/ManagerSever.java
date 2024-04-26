@@ -17,7 +17,7 @@ public class ManagerSever {
     private static final String attestationFilePath = "Info_IoTDevice.txt";
     private static final String domainFilePath = baseDir + "domain.txt";
     private static final String deviceFilePath = baseDir + "device.txt";
-    private static final String userFilePath = baseDir + "user.txt";
+    private static final String userFilePath = "user.txt";
     private static final String imageDirectoryPath = baseDir + "img/";
     private static final String temperatureDirectoryPath = baseDir + "temp/";
 
