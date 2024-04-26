@@ -25,7 +25,6 @@ public class DomainCatalog {
         try {
             populateDomainsFromFile();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -58,9 +57,6 @@ public class DomainCatalog {
 
     public Map<String, Float> temperatures(String domainName,
             DeviceCatalog devStorage) {
-        //FIXME A better implementation doesn't need access to devStorage
-        // This can be achieved by refactoring the domain's registered devices
-        // as a Set<Device> instead of Set<String>
 
         Domain domain = domains.get(domainName);
         Map<String, Float> temperatures = new HashMap<>();

@@ -34,17 +34,6 @@ public class ServerManager {
         new File(imageDirectoryPath).mkdirs();
         new File(temperatureDirectoryPath).mkdirs();
 
-        // register attestation value
-       /* try {
-            File attestationFile = new File(attestationFilePath);
-            BufferedReader attestationReader =
-                new BufferedReader(new FileReader(attestationFile));
-                clientFilePath = attestationReader.readLine();
-            attestationReader.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }*/
     }
 
     public static ServerManager getInstance(){
@@ -177,14 +166,7 @@ public class ServerManager {
             //return new ServerResponse(MessageCode.NODATA);
         return new ServerResponse(MessageCode.OK);
 
-
-
-
-
     }
-
-
-
 
     public ServerResponse getImage(String requesterUID, String targetUID,
             String targetDID) {
