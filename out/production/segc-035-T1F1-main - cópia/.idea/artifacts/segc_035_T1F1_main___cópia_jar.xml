@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="segc-035-T1F1-main - cópia:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/segc_035_T1F1_main___cópia_jar</output-path>
+    <root id="archive" name="segc-035-T1F1-main - cópia.jar">
+      <element id="module-output" name="segc-035-T1F1-main - cópia" />
+    </root>
+  </artifact>
+</component>

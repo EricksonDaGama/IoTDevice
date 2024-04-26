@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="IoTDevice:jar" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="82bdd15e-ffca-40d2-9762-2e1aa99955e4" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iotclient/IoTDevice.java" beforeDir="false" afterPath="$PROJECT_DIR$/iotclient/IoTDevice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iotserver/ServerThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/iotserver/ServerThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/segc-035-T1F1-main - cópia/output/truststore.client" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/segc-035-T1F1-main - cópia/output/truststore.client" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/truststore.client" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2fX5CmoCSvU4xb5HFKkC5Nl07JS" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.IoTDevice.executor&quot;: &quot;Run&quot;,
+    &quot;Application.IoTServer.executor&quot;: &quot;Run&quot;,
+    &quot;Application.src.client.IoTDevice.executor&quot;: &quot;Run&quot;,
+    &quot;Application.src.iotclient.IoTDevice.executor&quot;: &quot;Run&quot;,
+    &quot;Application.src.iotserver.IoTServer.executor&quot;: &quot;Run&quot;,
+    &quot;Application.src.server.IoTServer.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.IoTServer.jar.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Shell Script.attestation.sh.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/ericksoncacondo/Downloads/IofDevice fase 2- cópia&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15136719&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/output/user1" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/output/user1" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.src.server.IoTServer">
+    <configuration name="IoTDevice" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="src.iohelper.iotclient.IoTDevice" />
+      <module name="IoDevice fase 2" />
+      <option name="PROGRAM_PARAMETERS" value="localhost:12345 output/truststore.jceks output/user1/user1.jceks ampgeg 1 fc53653@alunos.fc.ul.pt" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="src.iohelper.iotclient.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IoTServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="src.iohelper.iotserver.IoTServer" />
+      <module name="IoDevice fase 2" />
+      <option name="PROGRAM_PARAMETERS" value="12345 output/server/server.keystore ampgeg 4RnyBuSaK2JhTV7fdwu1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="src.iohelper.iotserver.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="src.client.IoTDevice" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="src.client.IoTDevice" />
+      <module name="IoDevice fase 2" />
+      <option name="PROGRAM_PARAMETERS" value="localhost:12345 output/truststore.jceks output/user1/user1.jceks ampgeg 1 fc53653@alunos.fc.ul.pt" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="src.others.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="src.server.IoTServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="src.server.IoTServer" />
+      <module name="IoDevice fase 2" />
+      <option name="PROGRAM_PARAMETERS" value="12345 ampgeg output/server/server.keystore ampgeg 4RnyBuSaK2JhTV7fdwu1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="src.server.DeviceData" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IoTServer.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/IoTServer.jar" />
+      <method v="2" />
+    </configuration>
+    <configuration name="attestation.sh" type="ShConfigurationType" temporary="true">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/attestation.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.src.server.IoTServer" />
+        <item itemvalue="JAR Application.IoTServer.jar" />
+        <item itemvalue="Application.IoTServer" />
+        <item itemvalue="Shell Script.attestation.sh" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="82bdd15e-ffca-40d2-9762-2e1aa99955e4" name="Changes" comment="" />
+      <created>1713934457005</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1713934457005</updated>
+      <workItem from="1713934458074" duration="20168000" />
+      <workItem from="1713992449496" duration="11178000" />
+      <workItem from="1714005600492" duration="33985000" />
+      <workItem from="1714069380802" duration="360000" />
+      <workItem from="1714069788333" duration="109000" />
+      <workItem from="1714070045638" duration="1217000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -1,0 +1,3 @@
+fc54483@alunos.fc.ul.pt:1:15.0:Erickson1_3-22-24.jpeg
+fc53653@alunos.fc.ul.pt:1::Rodrigo1_3-22-24.jpeg
+fc54416@alunos.fc.ul.pt:1::
