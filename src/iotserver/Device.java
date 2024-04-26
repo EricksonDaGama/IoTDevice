@@ -6,7 +6,7 @@ import java.util.Set;
 public class Device {
     private String userId;
     private String devId;
-    private String fullId;
+    //private String fullId;
 
     private boolean online;
     private String imgPath;
@@ -20,7 +20,7 @@ public class Device {
     public Device(String userId, String devId) {
         this.userId = userId;
         this.devId = devId;
-        this.fullId = userId + ":" + devId;
+        //this.fullId = userId + ":" + devId;
         this.online = false;
         this.imgPath = null;
         this.temp = null;
