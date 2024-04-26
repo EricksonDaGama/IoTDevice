@@ -1,0 +1,14 @@
+/Device.class
+/DeviceStorage.class
+/Domain.class
+/DomainStorage.class
+/IoTServer$ServerThread.class
+/IoTServer.class
+/ServerAuth.class
+/ServerManager.class
+/ServerResponse.class
+/UserStorage.class
+/Authentication.class
+/DeviceCatalog.class
+/DomainCatalog.class
+/UserCatalog.class

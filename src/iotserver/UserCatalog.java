@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class UserStorage {
+public class UserCatalog {
     private Map<String, String> users;
     private File usersFile;
     private Lock wLock;
     private Lock rLock;
 
-    public UserStorage(String usersFilePath) {
+    public UserCatalog(String usersFilePath) {
         users = new HashMap<>();
         usersFile = new File(usersFilePath);
         ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock(true);

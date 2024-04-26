@@ -28,7 +28,7 @@ import java.util.List;
 public class IoTServer {
     public static final ServerManager SERVER_MANAGER = ServerManager
         .getInstance();
-    public static final ServerAuth SERVER_AUTH = ServerAuth.getInstance();
+    public static final Authentication SERVER_AUTH = Authentication.getInstance();
 
     private static final int ARG_NUM = 5;
     private static final int DEFAULT_PORT = 12345;
@@ -58,7 +58,7 @@ public class IoTServer {
             System.exit(-1);
         }
 
-        ServerAuth.setApiKey(apiKeyArg);
+        Authentication.setApiKey(apiKeyArg);
 
         System.setProperty("javax.net.ssl.keyStore", keystorePathArg);
         System.setProperty("javax.net.ssl.keyStorePassword", keystorePwdArg);
@@ -203,7 +203,7 @@ public class IoTServer {
                 InvalidKeyException, CertificateException, NoSuchAlgorithmException,
                 SignatureException {
             System.out.println("Starting user auth.");
-            ServerAuth sa = IoTServer.SERVER_AUTH;
+            Authentication sa = IoTServer.SERVER_AUTH;
             userID = (String) in.readObject();
 
             long nonce = sa.generateNonce();
@@ -245,12 +245,12 @@ public class IoTServer {
 
         private void attestClient() throws ClassNotFoundException, IOException,
                 NoSuchAlgorithmException {
-            long nonce = ServerAuth.generateNonce();
+            long nonce = Authentication.generateNonce();
             out.writeLong(nonce);
             out.flush();
 
             byte[] receivedHash = (byte[]) in.readObject();
-            if (ServerAuth.verifyAttestationHash(receivedHash, nonce)) {
+            if (Authentication.verifyAttestationHash(receivedHash, nonce)) {
                 out.writeObject(MessageCode.OK_TESTED);
             } else {
                 manager.disconnectDevice(userID, deviceID);
@@ -347,7 +347,7 @@ public class IoTServer {
                     if (parts.length >= 4) {
                         String deviceId = parts[1].trim();
                         String temperature = parts[2].trim();
-                        DomainStorage domStorage = new DomainStorage("output/server/domain.txt");
+                        DomainCatalog domStorage = new DomainCatalog("output/server/domain.txt");
                         if (domStorage.isUserRegisteredInDomain(parts[0], domain)) {
                             data.add("Device ID: " + deviceId + " - Temperature: " + temperature);
                         }
@@ -379,7 +379,7 @@ public class IoTServer {
         private void authUnregisteredUser(long nonce) throws IOException,
                 ClassNotFoundException, InvalidKeyException, CertificateException,
                 NoSuchAlgorithmException, SignatureException {
-            ServerAuth sa = IoTServer.SERVER_AUTH;
+            Authentication sa = IoTServer.SERVER_AUTH;
 
             long receivedUnsignedNonce = in.readLong();
             byte[] signedNonce = (byte[]) in.readObject();
@@ -398,7 +398,7 @@ public class IoTServer {
         private void authRegisteredUser(long nonce) throws ClassNotFoundException,
                 IOException, InvalidKeyException, CertificateException,
                 NoSuchAlgorithmException, SignatureException {
-            ServerAuth sa = IoTServer.SERVER_AUTH;
+            Authentication sa = IoTServer.SERVER_AUTH;
 
             byte[] signedNonce = (byte[]) in.readObject();
             if (sa.verifySignedNonce(signedNonce, userID, nonce)) {

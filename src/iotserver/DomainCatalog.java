@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class DomainStorage {
+public class DomainCatalog {
     private Map<String, Domain> domains;
     private File domainsFile;
     private Lock wLock;
     private Lock rLock;
 
-    public DomainStorage(String domainFilePath) {
+    public DomainCatalog(String domainFilePath) {
         domainsFile = new File(domainFilePath);
         domains = new HashMap<>();
 
@@ -59,7 +59,7 @@ public class DomainStorage {
     }
 
     public Map<String, Float> temperatures(String domainName,
-            DeviceStorage devStorage) {
+            DeviceCatalog devStorage) {
         //FIXME A better implementation doesn't need access to devStorage
         // This can be achieved by refactoring the domain's registered devices
         // as a Set<Device> instead of Set<String>

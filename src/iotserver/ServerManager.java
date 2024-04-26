@@ -15,9 +15,9 @@ import java.util.Set;
 public class ServerManager {
     private static volatile ServerManager instance;
 
-    private DomainStorage domStorage;
-    private DeviceStorage devStorage;
-    private UserStorage userStorage;
+    private DomainCatalog domStorage;
+    private DeviceCatalog devStorage;
+    private UserCatalog userStorage;
 
     private static final String baseDir = "./output/server/";
     private static final String attestationFilePath = "atestacaoRemota.txt";
@@ -28,9 +28,9 @@ public class ServerManager {
     private static final String temperatureDirectoryPath = baseDir + "temp/";
 
     private ServerManager(){
-        domStorage = new DomainStorage(domainFilePath);
-        devStorage = new DeviceStorage(deviceFilePath);
-        userStorage = new UserStorage(userFilePath);
+        domStorage = new DomainCatalog(domainFilePath);
+        devStorage = new DeviceCatalog(deviceFilePath);
+        userStorage = new UserCatalog(userFilePath);
 
         new File(imageDirectoryPath).mkdirs();
         new File(temperatureDirectoryPath).mkdirs();

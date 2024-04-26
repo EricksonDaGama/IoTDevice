@@ -1,26 +1,25 @@
 package src.iotserver;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 public class Domain {
     private String name;
     private String ownerId;
-    private Set<String> registeredUsers;
-    private Set<String> devices;
+    private ArrayList<String> users;
+    private ArrayList<String> devices;
 
     public Domain(String name, String ownerId) {
         this.name = name;
         this.ownerId = ownerId;
-        this.registeredUsers = new HashSet<>();
-        this.devices = new HashSet<>();
+        this.users = new ArrayList<>();
+        this.devices = new ArrayList<>();
     }
 
     public boolean registerUser(String userId) {
         if (this.isOwner(userId)){
             return false;
         }
-        return registeredUsers.add(userId);
+        return users.add(userId);
     }
 
     public boolean isOwner(String userId) {
@@ -28,7 +27,7 @@ public class Domain {
     }
 
     public boolean isRegistered(String userId) {
-        return registeredUsers.contains(userId) || isOwner(userId);
+        return users.contains(userId) || isOwner(userId);
     }
 
     public boolean registerDevice(String deviceFullID) {
@@ -43,12 +42,12 @@ public class Domain {
         return this.name;
     }
 
-    public Set<String> getDevices(){
+    public ArrayList<String> getDevices(){
         return this.devices;
     }
 
-    public Set<String> getUsers(){
-        return this.registeredUsers;
+    public ArrayList<String> getUsers(){
+        return this.users;
     }
 
     @Override
@@ -60,7 +59,7 @@ public class Domain {
         StringBuilder sb = new StringBuilder();
         sb.append(getName() + SP + ownerId);
 
-        for (String registeredUser : registeredUsers) {
+        for (String registeredUser : users) {
             sb.append(SP + registeredUser);
         }
 

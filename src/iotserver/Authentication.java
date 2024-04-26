@@ -14,28 +14,28 @@ import java.security.cert.CertificateFactory;
 import java.util.Base64;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ServerAuth {
-    private static volatile ServerAuth INSTANCE;
+public class Authentication {
+    private static volatile Authentication INSTANCE;
 
     private static final String USER_FILEPATH = "user.txt";
     private static String apiKey;
 
-    private UserStorage userStorage;
+    private UserCatalog userStorage;
 
-    public static ServerAuth getInstance() {
-        ServerAuth instance = INSTANCE;
+    public static Authentication getInstance() {
+        Authentication instance = INSTANCE;
         if (instance != null)
             return instance;
 
-        synchronized (ServerAuth.class) {
+        synchronized (Authentication.class) {
             if (instance == null)
-                instance = new ServerAuth();
+                instance = new Authentication();
             return instance;
         }
     }
 
-    private ServerAuth() {
-        userStorage = new UserStorage(USER_FILEPATH);
+    private Authentication() {
+        userStorage = new UserCatalog(USER_FILEPATH);
     }
 
     public boolean isUserRegistered(String user) {
