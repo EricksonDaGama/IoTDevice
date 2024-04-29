@@ -176,26 +176,6 @@ public class IoTDevice {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-        new IoTDevice().iniciarCliente();
-    }
-    public void iniciarCliente() {
-        // System.out.println("user-id: " + userid);
-        // System.out.println("device-id: " + devid);
-        // try  {
-
-        //     // SocketFactory sf = SSLSocketFactory.getDefault();
-        //     // SSLSocket soc = (SSLSocket) sf.createSocket(host, 12345);
-
-        //     // ObjectOutputStream outStream = new ObjectOutputStream(soc.getOutputStream());
-        //     // ObjectInputStream inStream = new ObjectInputStream(soc.getInputStream());
-        //     // Scanner scanner = new Scanner(System.in);
-        //     //1autenticar usuario
-
-        // } catch (IOException e) {
-        //     System.err.println("Erro ao conectar ao servidor.");
-        //     e.printStackTrace();
-        // }
     }
     private boolean autenticarUsuario(Scanner scanner, ObjectOutputStream outStream, ObjectInputStream inStream) throws IOException {
         while (true) { // Loop até a autenticação ser bem-sucedida ou falhar por outro motivo
@@ -287,11 +267,21 @@ public class IoTDevice {
         System.out.println("EI <filename.jpg> # Enviar Imagem para o servidor");
         System.out.println("RT <dm> # Receber medições de Temperatura do domínio");
         System.out.println("RI <user-id>:<dev_id> # Receber Imagem do servidor");
+        System.out.println("MYDOMAINS # Listar dominios do utilizador");
         System.out.println("EXIT # Sair do programa");
     }
     //processar o comando inserido pelo cliente e enviar ao servidor metodo pequeno
     private static void processarComando(String comando, ObjectOutputStream outStream, ObjectInputStream inStream) throws IOException {
-        if (comando.toUpperCase().startsWith("EI ")) {
+        if (comando.toUpperCase().equals("MYDOMAINS")) {
+            // Enviar pedido ao servidor
+            outStream.writeUTF(comando);
+            outStream.flush();
+
+            // Ler resposta do servidor
+            System.out.println("Domínios associados ao usuário:");
+            System.out.println("OK");
+
+        } else if (comando.toUpperCase().startsWith("EI ")) {
             String filename = comando.substring(3);
             enviarImagem(filename, outStream);
         } else if (comando.toUpperCase().startsWith("RT ")) {

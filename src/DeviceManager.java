@@ -176,4 +176,32 @@ public class DeviceManager {
         }
         return null; // Nenhum caminho de imagem encontrado
     }
+
+    public synchronized List<String> getDeviceDomains(String user) {
+        String usuarioID = user;
+        List<String> domainList = new ArrayList<>();
+        String currentDomain = null;  // Store the current domain being processed
+
+        try (Scanner reader = new Scanner(new FileReader("dominios.txt"))) {
+            String line;
+
+            while (reader.hasNextLine()) {
+                line = reader.nextLine();
+                if (line.trim().startsWith("Domínio: ")) {
+                    currentDomain = line.substring(line.indexOf(':') + 1).trim();  // Update current domain
+                } else if (line.trim().startsWith("Usuários com permissão:")) {
+                    if (line.contains(usuarioID)) {
+                        // If the device is listed under the current domain, add the domain to the list
+                        if (currentDomain != null) {
+                            domainList.add(currentDomain);
+                        }
+                    }
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return domainList;
+    }
 }

@@ -3,3 +3,8 @@ Domínio: ola
 Owner: fc54416@alunos.fc.ul.pt
 Usuários com permissão: fc54416@alunos.fc.ul.pt
 Dispositivos registrados: 
+
+Domínio: dm1
+Owner: fc54416@alunos.fc.ul.pt
+Usuários com permissão: fc54416@alunos.fc.ul.pt
+Dispositivos registrados: 

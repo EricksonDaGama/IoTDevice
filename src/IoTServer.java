@@ -309,6 +309,9 @@ public class IoTServer {
                 }
                 return handleImageRequest(parts[1], outStream);
             }
+            if(parts[0].equalsIgnoreCase("MYDOMAINS")) {
+                return handleMyDomains(this.userid);
+            }
             return "Comando Desconhecido";
         }
         private String handleImageRequest(String deviceId, ObjectOutputStream outStream) throws IOException {
@@ -486,6 +489,17 @@ public class IoTServer {
                 return "NOK"; // Formato de temperatura inválido
             }
             //return "NOK"; // Dispositivo não registrado ou outro erro
+        }
+        private String handleMyDomains(String userID) {
+            if (userID == null || userID.isEmpty()) {
+                return "ERROR: User ID is required for MYDOMAINS command";
+            }
+            System.out.println("User ID: " + userID);
+            List<String> domains = deviceManager.getDeviceDomains(userID);
+            if (domains.isEmpty()) {
+                return "No domains found for device " + userID;
+            }
+            return String.join(", ", domains);  // Appending 'OK' to signify the end of data
         }
         private String criarDominio(String nomeDominio) {
             // Implementar lógica para criar um domínio
