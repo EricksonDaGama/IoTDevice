@@ -10,13 +10,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="59e2f19e-a56c-43a1-ad01-ef5f596df3a1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/Cliente_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/SegC_grupo02__proj1_fase1_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/Server_jar.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IoTDevice.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IoTServer.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SegC-grupo02- proj1-fase1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/SegC-grupo02- proj1-fase1.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/IoTDevice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IoTDevice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/IoTServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IoTServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotclient/IoTDevice.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotclient/MessageCode.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/Authentication.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/Device.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/DeviceCatalog.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/Domain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/DomainCatalog.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/FileHelper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/IoTServer$ServerThread.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/IoTServer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/ServerManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/ServerResponse.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/iotserver/UserCatalog.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/truststore.jceks" beforeDir="false" afterPath="$PROJECT_DIR$/truststore.jceks" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +43,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -42,57 +55,67 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.IoTDevice.executor": "Run",
-    "Application.IoTServer (1).executor": "Run",
-    "Application.IoTServer.executor": "Run",
-    "Application.Main.executor": "Run",
-    "JAR Application.Cliente.jar (1).executor": "Run",
-    "JAR Application.Cliente.jar.executor": "Run",
-    "JAR Application.IoTDevice.jar (1).executor": "Run",
-    "JAR Application.IoTDevice.jar.executor": "Run",
-    "JAR Application.IoTServer.jar (1).executor": "Run",
-    "JAR Application.IoTServer.jar.executor": "Run",
-    "JAR Application.SegC-grupo02- proj1-fase1.jar (1).executor": "Run",
-    "JAR Application.SegC-grupo02- proj1-fase1.jar.executor": "Run",
-    "JAR Application.Server.jar (1).executor": "Run",
-    "JAR Application.Server.jar.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "fase2-original",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/rodrigo/Documents/GitHub/IoTDevice",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src/Main.java",
-    "project.structure.last.edited": "Artifacts",
-    "project.structure.proportion": "0.15234375",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "settings.sync",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.IoTDevice.executor&quot;: &quot;Run&quot;,
+    &quot;Application.IoTServer (1).executor&quot;: &quot;Run&quot;,
+    &quot;Application.IoTServer.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.Cliente.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.Cliente.jar.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.IoTDevice.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.IoTDevice.jar.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.IoTServer.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.IoTServer.jar.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.SegC-grupo02- proj1-fase1.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.SegC-grupo02- proj1-fase1.jar.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.Server.jar (1).executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.Server.jar.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;fase2-original&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/rodrigo/Documents/GitHub/IoTDevice&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;/Users/ericksoncacondo/Library/CloudStorage/OneDrive-UniversidadedeLisboa/FCUL/3ANO/II Semestre/Seg e connfialidade/23 24/SegC-grupo02- proj1-fase1/src/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15234375&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\rodri\Desktop\GitHub Projects\IoTDevice" />
+      <recent name="C:\Users\rodri\Desktop\GitHub Projects\IoTDevice\src" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/dadosSensoriasClientes" />
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager" selected="JAR Application.IoTDevice.jar (1)">
+  <component name="RunManager" selected="Application.IoTDevice2">
     <configuration name="IoTDevice" type="Application" factoryName="Application" singleton="false" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="IoTDevice" />
       <module name="SegC-grupo02- proj1-fase1" />
-      <option name="PROGRAM_PARAMETERS" value="localhost 44 Erickson" />
+      <option name="PROGRAM_PARAMETERS" value="localhost 1 Rodas" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IoTDevice2" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="IoTDevice" />
+      <module name="SegC-grupo02- proj1-fase1" />
+      <option name="PROGRAM_PARAMETERS" value="localhost truststore.jks user4.jks password 1 fc54416@alunos.fc.ul.pt" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -100,6 +123,14 @@
     <configuration name="IoTServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="IoTServer" />
       <module name="SegC-grupo02- proj1-fase1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IoTServer2" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="IoTServer" />
+      <module name="SegC-grupo02- proj1-fase1" />
+      <option name="PROGRAM_PARAMETERS" value="ampgeg keystore.server password 4RnyBuSaK2JhTV7fdwu1" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -119,6 +150,8 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Application.IoTServer2" />
+      <item itemvalue="Application.IoTDevice2" />
       <item itemvalue="Application.IoTServer" />
       <item itemvalue="Application.IoTDevice" />
       <item itemvalue="JAR Application.IoTDevice.jar" />
@@ -127,10 +160,10 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.IoTServer" />
         <item itemvalue="JAR Application.IoTDevice.jar (1)" />
         <item itemvalue="JAR Application.IoTServer.jar (1)" />
         <item itemvalue="Application.IoTDevice" />
-        <item itemvalue="Application.IoTServer" />
         <item itemvalue="JAR Application.IoTDevice.jar" />
       </list>
     </recent_temporary>

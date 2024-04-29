@@ -8,6 +8,8 @@ import java.util.concurrent.Executors;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -94,9 +96,9 @@ public class IoTServer {
 
         System.setProperty("javax.net.ssl.keyStore", keystore);
 		System.setProperty("javax.net.ssl.keyStorePassword", keystorePassword);
-        System.setProperty("javax.net.ssl.keyStoreType", "JCEKS");
+        System.setProperty("javax.net.ssl.keyStoreType", "JKS");
 
-        ServerSocketFactory ssf = ServerSocketFactory.getDefault();
+        ServerSocketFactory ssf = SSLServerSocketFactory.getDefault();
         
         try  {
             System.out.println("Servidor iniciado.");
@@ -141,6 +143,8 @@ public class IoTServer {
             try {
                 ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream());
+
+                System.out.println("Cheguei ao run");
 
                 //1-recebendo dados do cliente
                 boolean authenticated = false;

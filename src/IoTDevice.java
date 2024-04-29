@@ -54,12 +54,15 @@ public class IoTDevice {
             System.exit(1);
         }
 
+        System.out.println("Truststore: " + truststore);
+        System.out.println("Keystore: " + keystore);
+
         System.setProperty("javax.net.ssl.trustStore", truststore);
         System.setProperty("javax.net.ssl.trustStorePassword", "");
-        System.setProperty("javax.net.ssl.trustStoreType", "JCEKS");
+        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
         System.setProperty("javax.net.ssl.keyStore", keystore);
         System.setProperty("javax.net.ssl.keyStorePassword", keystorePw);
-        System.setProperty("javax.net.ssl.keyStoreType", "JCEKS");
+        System.setProperty("javax.net.ssl.keyStoreType", "JKS");
 
         FileInputStream tfile;
         try {
@@ -68,7 +71,9 @@ public class IoTDevice {
             KeyStore tstore = KeyStore.getInstance(KeyStore.getDefaultType());
             tstore.load(tfile, "ampgeg".toCharArray());
 
-            KeyStore kstore = KeyStore.getInstance(KeyStore.getDefaultType()); 
+            System.out.println("passei");
+
+            KeyStore kstore = KeyStore.getInstance(KeyStore.getDefaultType());
             kstore.load(new FileInputStream(keystore), keystorePw.toCharArray());
 
             SocketFactory ssf = SSLSocketFactory.getDefault();
