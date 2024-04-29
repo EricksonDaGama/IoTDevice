@@ -156,6 +156,9 @@ public class IoTServer {
                     secureRandom.nextBytes(nonce);
 
                     Signature signature = Signature.getInstance("MD5withRSA");
+
+                    outStream.writeObject(nonce);
+                    outStream.writeObject(authenticationService.userExists(userid));
                     
                     if (authenticationService.userExists(userid)) {
 

@@ -71,26 +71,20 @@ public class IoTDevice {
             KeyStore tstore = KeyStore.getInstance(KeyStore.getDefaultType());
             tstore.load(tfile, "ampgeg".toCharArray());
 
-            System.out.println("passei");
-
             KeyStore kstore = KeyStore.getInstance(KeyStore.getDefaultType());
             kstore.load(new FileInputStream(keystore), keystorePw.toCharArray());
 
             SocketFactory ssf = SSLSocketFactory.getDefault();
 			SSLSocket socket = (SSLSocket) ssf.createSocket(host, PORT);
 
-            System.out.println("Passei SSL");
-
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-
-            System.out.println("Passei object streams");
 
 			out.writeObject(userid);
 
 			System.out.println("Autenticating...");
 
-			byte[] nonce = (byte[]) in.readObject();
+            byte[] nonce = (byte[]) in.readObject();
 			boolean userExists = (Boolean) in.readObject();
 
 			PrivateKey privateKey = (PrivateKey) kstore.getKey(kstore.aliases().nextElement().toString(),
@@ -98,16 +92,16 @@ public class IoTDevice {
 			Signature signature = Signature.getInstance("MD5withRSA");
 
             Scanner scanner = new Scanner(System.in);
-
+            System.out.println("Nonce");
             if (userExists) {
-
+                System.out.println("UserExists");
 				SignedObject signedObject = new SignedObject(nonce, privateKey, signature);
 				out.writeObject(signedObject);
 
 				if ((boolean) in.readObject()) {
 					System.out.println("User autenticated!");
 					System.out.println("Chose an operation:");
-					mostrarMenu();
+					//mostrarMenu();
 
 					String directoryName = "output/client" + userid;
 					File directory = new File(directoryName);
@@ -120,20 +114,21 @@ public class IoTDevice {
 				}
 
 			} else {
+                System.out.println("!UserExists");
 
 				out.writeObject(nonce);
 
 				signature.initSign(privateKey);
 
 				out.writeObject(signature.sign());
-				String[] name = keystore.split("\\.");
-				Certificate certificate = tstore.getCertificate(name[0]);
+				//String[] name = keystore.split("\\.");
+				Certificate certificate = tstore.getCertificate(userid);
 				out.writeObject(certificate);
 
 				if ((Boolean) in.readObject()) {
 					System.out.println("Registration successful!");
 					System.out.println("Chose an operation:");
-					mostrarMenu();
+					//mostrarMenu();
 
 					String directoryName = "output/client/" + userid;
 					File directory = new File(directoryName);
