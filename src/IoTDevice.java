@@ -58,7 +58,7 @@ public class IoTDevice {
         System.out.println("Keystore: " + keystore);
 
         System.setProperty("javax.net.ssl.trustStore", truststore);
-        System.setProperty("javax.net.ssl.trustStorePassword", "");
+        System.setProperty("javax.net.ssl.trustStorePassword", "ampgeg");
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
         System.setProperty("javax.net.ssl.keyStore", keystore);
         System.setProperty("javax.net.ssl.keyStorePassword", keystorePw);
@@ -79,8 +79,12 @@ public class IoTDevice {
             SocketFactory ssf = SSLSocketFactory.getDefault();
 			SSLSocket socket = (SSLSocket) ssf.createSocket(host, PORT);
 
+            System.out.println("Passei SSL");
+
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+
+            System.out.println("Passei object streams");
 
 			out.writeObject(userid);
 
