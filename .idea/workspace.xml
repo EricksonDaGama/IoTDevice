@@ -11,9 +11,18 @@
   <component name="ChangeListManager">
     <list default="true" id="59e2f19e-a56c-43a1-ad01-ef5f596df3a1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dominios.txt" beforeDir="false" afterPath="$PROJECT_DIR$/dominios.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/executavel.txt" beforeDir="false" afterPath="$PROJECT_DIR$/executavel.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/IoTDevice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IoTDevice.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/IoTServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/IoTServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/truststore.jceks" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user1.jceks" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user2.cer" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user2.jceks" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user3.cer" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user3.jceks" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user4.cer" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/usuario1.cer" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

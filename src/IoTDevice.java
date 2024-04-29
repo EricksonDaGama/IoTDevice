@@ -127,13 +127,6 @@ public class IoTDevice {
 
 				if ((Boolean) in.readObject()) {
 					System.out.println("Registration successful!");
-					System.out.println("Chose an operation:");
-					//mostrarMenu();
-
-					String directoryName = "output/client/" + userid;
-					File directory = new File(directoryName);
-					directory.mkdirs();
-
 				} else {
 					System.out.println("Failed to register and authenticate!");
 					socket.close();
@@ -141,10 +134,6 @@ public class IoTDevice {
 				}
 			}
 
-            // boolean autenticado = false;
-            // while (!autenticado) {
-            //     autenticado = autenticarUsuario(scanner, outStream, inStream);
-            // }
             //2enviar device-id
             enviarDeviceId(scanner, out, in);  // Primeiro envia o Device ID
             //3enviar dados do executavel

@@ -161,22 +161,27 @@ public class IoTServer {
                     outStream.writeObject(authenticationService.userExists(userid));
                     
                     if (authenticationService.userExists(userid)) {
-
+                        System.out.println("Entrei Existe");
                         SignedObject signedObject = (SignedObject) inStream.readObject();
-                        FileInputStream fileInputStream = new FileInputStream("output/client/" + userid + "/" + userid + ".cer");
+                        FileInputStream fileInputStream = new FileInputStream( userid + ".cer");
                         CertificateFactory cf = CertificateFactory.getInstance("X509");
                         Certificate certificate = cf.generateCertificate(fileInputStream);
                         PublicKey publicKey = certificate.getPublicKey();
 
                         if (Arrays.equals((byte[]) signedObject.getObject(), nonce)
 							&& signedObject.verify(publicKey, signature)) {
+                            System.out.println("Entrei verify");
 						    outStream.writeObject(true);
+
                         } else {
+                            System.out.println("Entrei nverify");
                             outStream.writeObject(false);
+                            System.exit(-1);
                         }
-                            
-                        outStream.writeObject(authenticationService.userExists(userid));
+                        authenticated = true;
+                        //outStream.writeObject(authenticationService.userExists(userid));
                     } else {
+                        System.out.println("Entrei Nao Existe");
                         byte[] receivedNonce = (byte[]) inStream.readObject();
                         byte[] signatureBytes = (byte[]) inStream.readObject();
                         Certificate certificate = (Certificate) inStream.readObject();
@@ -185,11 +190,12 @@ public class IoTServer {
     
                         if (Arrays.equals(receivedNonce, nonce) && signature.verify(signatureBytes)) {
     
-                            authenticationService.saveNewUser(userid, "output/client/" + userid + "/" + userid + ".cer");
-
+                            authenticationService.saveNewUser(userid,  userid + ".cer");
+                            authenticated = true;
                             outStream.writeObject(true);
                         } else {
                             outStream.writeObject(false);
+                            System.exit(-1);
                         }
                     }
     
@@ -198,6 +204,7 @@ public class IoTServer {
                 boolean deviceRegistered = false;
                 while (!deviceRegistered) {
                     devId = (String) inStream.readObject();
+                    System.out.println("Get device");
                     boolean isRegistered = deviceManager.registerDevice(userid, devId);
 
                     if (!isRegistered) {
@@ -231,9 +238,9 @@ public class IoTServer {
                         break;  // Sair do loop em caso de erro
                     }
                 }
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException e) {
                 System.err.println("Erro ao tratar cliente: " + e.getMessage());
-                // Tratar a exceção conforme necessário
+                e.printStackTrace();
             } catch (CertificateException e) {
                 e.printStackTrace();
             } catch (InvalidKeyException e) {
@@ -242,6 +249,9 @@ public class IoTServer {
                 e.printStackTrace();
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
             } finally {
                 // A lógica de limpeza e fechamento do socket
                 if (userid != null && devId != null) {
