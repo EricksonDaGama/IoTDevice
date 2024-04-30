@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="IoTDevice-fase2-original-2:jar2">
+    <output-path>$PROJECT_DIR$/out/artifacts/IoTDevice_fase2_original_2_jar2</output-path>
+    <root id="archive" name="IoTDevice-fase2-original-2.jar">
+      <element id="module-output" name="IoTDevice-fase2-original-2" />
+    </root>
+  </artifact>
+</component>
